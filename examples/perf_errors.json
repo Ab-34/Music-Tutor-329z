@@ -1,0 +1,19 @@
+[
+  {
+    "type": "extra",
+    "time": 8.068,
+    "pitch": 63
+  },
+  {
+    "type": "wrong_pitch",
+    "time": 9.5,
+    "pitch": 64,
+    "played_pitch": 52,
+    "delta": -12
+  },
+  {
+    "type": "extra",
+    "time": 12.996,
+    "pitch": 57
+  }
+]
