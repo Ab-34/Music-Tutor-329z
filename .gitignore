@@ -8,3 +8,5 @@ data/cases/
 data/soundfonts/
 runs/
 memory_store/
+llm_ledger.jsonl
+.llm_cache/

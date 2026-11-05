@@ -24,10 +24,10 @@ which has 3 known mistakes listed in `examples/perf_errors.json`:
 python -m tutor.cli assess --ref examples/ref.mid --perf examples/perf.mid --no-llm
 ```
 
-**2. Run the agent** (needs an Anthropic API key):
+**2. Run the agent** (needs an [OpenRouter](https://openrouter.ai) API key):
 
 ```bash
-cp .env.example .env        # then put your key in ANTHROPIC_API_KEY
+cp .env.example .env        # then put your key in OPENROUTER_API_KEY
 python -m tutor.cli assess --ref examples/ref.mid --perf examples/perf.mid --learner demo
 python -m tutor.cli memory --learner demo      # the mistakes the agent logged
 ```
@@ -41,6 +41,19 @@ python -m tutor.cli simplify --ref examples/ref.mid --out runs/simplified
 ```
 
 **4. Tests:** `pytest -q`
+
+## Models and budget
+
+All LLM calls go through `tutor/llm.py` to OpenRouter's OpenAI-compatible API. `TUTOR_MODEL` takes any
+OpenRouter model id. The default is `anthropic/claude-sonnet-5.5`.
+
+- **Total cap:** every paid call is logged to `llm_ledger.jsonl`. Once the total reaches `TUTOR_BUDGET_USD`,
+  new calls raise `BudgetExceeded` and `eval.run_eval` stops and grades the cases it finished.
+- **Cap per agent run:** `TUTOR_RUN_BUDGET_USD` (default $0.50) stops a single assessment that loops for too long.
+- **Cache:** identical requests are answered from `.llm_cache/` for free. Set `TUTOR_CACHE=0` to turn it off.
+- **Report:** `python -m tutor.llm` shows spending by tag and model.
+
+For a hard limit on the provider side as well, set a credit limit on the key in the OpenRouter dashboard.
 
 ## Audio path (transcription, synthesis, self-check)
 
@@ -91,9 +104,9 @@ Transcription quality on its own: `python -m eval.grade_transcription --manifest
 ```
 tutor/notes.py            Note type, MIDI I/O
 tutor/tools/              transcribe, synth, self_check, align (+error candidates), score_text, memory, simplify
-tutor/agent.py            orchestrator: tool-use loop with Claude, logs a trace per run
+tutor/agent.py            orchestrator: tool-use loop (OpenRouter), logs a trace per run
 tutor/baselines/          algorithmic (B0), audio_llm (B1, stub), text_llm (B2)
-tutor/llm.py              model settings (TUTOR_MODEL, TUTOR_EFFORT)
+tutor/llm.py              OpenRouter client, budget ledger, cache (TUTOR_MODEL, TUTOR_BUDGET_USD)
 data/make_perturbations.py  eval set builder
 eval/                     run_eval, grade_detection, grade_transcription
 examples/                 bundled quick-start example (+ make_example.py to regenerate it)
@@ -110,5 +123,3 @@ examples/                 bundled quick-start example (+ make_example.py to rege
   player errors.
 - Synthesized audio is cleaner than real recordings. We also evaluate on a small set of real
   recordings we made ourselves.
-- `tutor/llm.py` turns on Anthropic's server-side refusal fallback (`fallbacks="default"`) so a
-  rare safety-classifier decline doesn't fail an eval case. Delete those two lines to turn it off.

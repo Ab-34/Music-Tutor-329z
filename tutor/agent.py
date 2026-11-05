@@ -11,6 +11,7 @@ is logged into a trace -- the traces are what the error analysis is built on.
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -162,47 +163,67 @@ class Session:
             raise RuntimeError("no transcription yet; call transcribe_performance first")
 
 
+# OpenAI-style function tools, as OpenRouter expects them.
+OAI_TOOLS = [{"type": "function", "function": {"name": t["name"], "description": t["description"],
+                                               "parameters": t["input_schema"]}} for t in TOOLS]
+TOOL_NAMES = {t["name"] for t in TOOLS}
+
+# Per-run spending cap (USD), so one runaway loop can't eat the whole budget.
+RUN_BUDGET_USD = float(os.environ.get("TUTOR_RUN_BUDGET_USD", "0.50"))
+
+
 def run_agent(ref_path: str, perf_path: str, learner: str = "default", piece: str | None = None,
               max_turns: int = 20, write_memory: bool = True) -> dict:
     s = Session(ref_path, perf_path, learner, piece or Path(ref_path).parent.name or Path(ref_path).stem)
     s.ref = load_midi(ref_path)
     kind = "audio recording" if s.is_audio else "MIDI performance (already symbolic; transcription is exact)"
     duration = max((n.offset for n in s.ref), default=0)
-    messages = [{"role": "user", "content":
+    messages = [{"role": "system", "content": SYSTEM},
+                {"role": "user", "content":
                  f"Learner: {learner}. Piece: {s.piece} ({duration:.1f} s, {len(s.ref)} notes). "
                  f"Performance is a {kind}. Assess it and submit your report."}]
-    usage = {"input_tokens": 0, "output_tokens": 0}
+    usage = {"input_tokens": 0, "output_tokens": 0, "cost_usd": 0.0, "cached_calls": 0}
+    stop_error = None
 
     for _ in range(max_turns):
-        resp = llm.create(system=SYSTEM, tools=TOOLS, messages=messages)
-        usage["input_tokens"] += resp.usage.input_tokens
-        usage["output_tokens"] += resp.usage.output_tokens
-        messages.append({"role": "assistant", "content": resp.content})
-        if resp.stop_reason == "refusal":
+        if usage["cost_usd"] >= RUN_BUDGET_USD:
+            stop_error = f"run budget of ${RUN_BUDGET_USD:.2f} reached (TUTOR_RUN_BUDGET_USD)"
+            break
+        resp = llm.chat(messages, tools=OAI_TOOLS, tag="agent")
+        u = resp.get("usage") or {}
+        usage["input_tokens"] += u.get("prompt_tokens", 0)
+        usage["output_tokens"] += u.get("completion_tokens", 0)
+        usage["cost_usd"] += resp["cost_usd"]
+        usage["cached_calls"] += resp["cached"]
+        msg = llm.message_of(resp)
+        if msg.get("refusal"):
             s.trace.append({"event": "refusal"})
             break
-        if resp.stop_reason == "pause_turn":
-            continue
-        calls = [b for b in resp.content if b.type == "tool_use"]
+        calls = msg.get("tool_calls") or []
+        messages.append({"role": "assistant", "content": msg.get("content") or "",
+                         **({"tool_calls": [{"id": c["id"], "type": "function", "function": c["function"]}
+                                            for c in calls]} if calls else {})})
         if not calls:
-            if s.report is None:  # nudge once if it answered in prose
+            if s.report is None:  # nudge if it answered in prose
                 messages.append({"role": "user", "content": "Please call submit_report with your findings."})
                 continue
             break
-        results = []
         for c in calls:
+            name = c["function"]["name"]
             try:
-                out = getattr(s, c.name)(**(c.input or {}))
-                results.append({"type": "tool_result", "tool_use_id": c.id, "content": json.dumps(out)})
-                s.trace.append({"tool": c.name, "input": c.input, "ok": True})
+                args = json.loads(c["function"].get("arguments") or "{}")
+                if name not in TOOL_NAMES:
+                    raise ValueError(f"unknown tool {name!r}")
+                out = json.dumps(getattr(s, name)(**args))
+                s.trace.append({"tool": name, "input": args, "ok": True})
             except Exception as e:  # report tool errors back to the model
-                results.append({"type": "tool_result", "tool_use_id": c.id, "content": str(e), "is_error": True})
-                s.trace.append({"tool": c.name, "input": c.input, "ok": False, "error": str(e)})
-        messages.append({"role": "user", "content": results})
+                out = f"ERROR: {e}"
+                s.trace.append({"tool": name, "input": c["function"].get("arguments"), "ok": False, "error": str(e)})
+            messages.append({"role": "tool", "tool_call_id": c["id"], "content": out})
         if s.report is not None:
             break
 
-    report = s.report or {"errors": [], "feedback": "", "error": "agent did not submit a report"}
+    report = s.report or {"errors": [], "feedback": "", "error": stop_error or "agent did not submit a report"}
     if write_memory and report.get("errors"):
         report["memory"] = memory.write(learner, s.piece, report["errors"])
     report["trace"] = s.trace
