@@ -1,0 +1,84 @@
+[
+  {
+    "type": "missed",
+    "time": 0.333,
+    "pitch": 68,
+    "description": "Pickup: skipped the G#4"
+  },
+  {
+    "type": "missed",
+    "time": 1.667,
+    "pitch": 71,
+    "description": "Bar 1, beat 2: skipped the B4"
+  },
+  {
+    "type": "timing",
+    "time": 3.0,
+    "pitch": 75,
+    "offset_ms": 270,
+    "description": "Bar 2, beat 2: hesitated, so the D#5 came 270 ms late"
+  },
+  {
+    "type": "timing",
+    "time": 3.667,
+    "pitch": 80,
+    "offset_ms": 270,
+    "weak_spot": true,
+    "description": "Bar 3, beat 1: hesitated, so the G#5 came 270 ms late  (weak spot: same mistake every take)"
+  },
+  {
+    "type": "wrong_pitch",
+    "time": 4.667,
+    "pitch": 84,
+    "played_pitch": 88,
+    "weak_spot": true,
+    "description": "Bar 4, beat 1: played E6 instead of C6  (weak spot: same mistake every take)"
+  },
+  {
+    "type": "timing",
+    "time": 5.333,
+    "pitch": 81,
+    "offset_ms": 230,
+    "description": "Bar 4, beat 2: hesitated, so the A5 came 230 ms late"
+  },
+  {
+    "type": "missed",
+    "time": 6.333,
+    "pitch": 81,
+    "description": "Bar 5, beat 1: skipped the A5"
+  },
+  {
+    "type": "wrong_pitch",
+    "time": 7.333,
+    "pitch": 83,
+    "played_pitch": 85,
+    "description": "Bar 6, beat 1: played C#6 instead of B5"
+  },
+  {
+    "type": "wrong_pitch",
+    "time": 8.333,
+    "pitch": 81,
+    "played_pitch": 74,
+    "weak_spot": true,
+    "description": "Bar 6, beat 2: played D5 instead of A5  (weak spot: same mistake every take)"
+  },
+  {
+    "type": "extra",
+    "time": 9.167,
+    "pitch": 85,
+    "description": "Bar 7, beat 1: an extra C#6 that isn't in the score"
+  },
+  {
+    "type": "missed",
+    "time": 9.667,
+    "pitch": 78,
+    "weak_spot": true,
+    "description": "Bar 7, beat 2: skipped the F#5  (weak spot: same mistake every take)"
+  },
+  {
+    "type": "missed",
+    "time": 11.0,
+    "pitch": 77,
+    "description": "Bar 8, beat 2: skipped the F5"
+  }
+]

@@ -72,6 +72,24 @@ streamlit run gui/app.py          # opens http://localhost:8501
 
 Design: `docs/superpowers/specs/2026-11-05-gui-design.md`.
 
+## Demo learners: Rondo alla Turca
+
+`examples/rondo/` holds the pickup and the first 8 bars of Mozart's *Rondo alla Turca* (K. 331), taken from the
+public-domain [Mutopia Project](https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=108) score MIDI (see
+`examples/rondo/source/SOURCE.md`) and played at 90 bpm. There are 10 takes by learners at four levels, each mistake
+labelled in plain English (for example "Bar 3, beat 1: played D5 instead of B5"):
+
+| Level | Mistakes per take | Notes |
+|---|---|---|
+| Perfect | 0 | Checks that the system doesn't invent errors |
+| Nearly there | 1 | One clear slip |
+| Intermediate | 5–6 | Wrong and skipped notes, a hesitation, plays 10% slower |
+| Struggling | 12–14 | Plays 30% slower, with many wrong and skipped notes, hesitations and stray notes |
+
+Each level has fixed *weak spots* that repeat in every take, so the agent's memory has something to notice. The takes
+are the GUI's default input, and you can listen before revealing what's wrong. They also form an eval set
+(`examples/rondo/manifest.jsonl`). To regenerate them: `python -m examples.rondo_demo`.
+
 ## Audio path (transcription, synthesis, self-check)
 
 ```bash
@@ -134,7 +152,7 @@ examples/                 bundled quick-start example (+ make_example.py to rege
 
 - MAESTRO is *performance* MIDI with no reliable bar lines, so we locate errors in seconds,
   not measures.
-- Alignment is v0: a global linear time map plus greedy same-pitch matching. Real players vary
+- Alignment is v0: a global linear time map (started from the ratio of the two durations, so a uniformly slower player is handled) plus greedy same-pitch matching. Real players vary
   their tempo locally; DTW-based alignment is the planned upgrade.
 - With `--input midi`, the algorithmic baseline is already near-perfect on synthetic
   perturbations. The agent should add value on audio, where transcription errors look like

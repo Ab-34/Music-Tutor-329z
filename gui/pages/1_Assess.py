@@ -34,8 +34,35 @@ def _mtime(p: str) -> float:
 
 # ---- input ------------------------------------------------------------------
 
+def pick_rondo() -> dict:
+    from examples.rondo_demo import PROFILES
+
+    takes = sources.rondo_takes()
+    c1, c2 = st.columns([1, 2])
+    level = c1.selectbox("Learner level", list(PROFILES), format_func=lambda lv: PROFILES[lv].title, key="rondo_level")
+    mine = [t for t in takes if t.level == level]
+    s = c2.selectbox("Take", mine, format_func=lambda t: t.label, key="rondo_take")
+    st.caption(f"**{PROFILES[level].title}:** {PROFILES[level].blurb}  ·  Mozart, *Rondo alla Turca* (K. 331), "
+               "pickup + first 8 bars at 90 bpm. True notes are from the public-domain Mutopia score.")
+    a1, a2 = st.columns(2)
+    a1.markdown("**The score, played correctly**")
+    a1.audio(wav_of(s.ref, _mtime(s.ref)), format="audio/wav")
+    a2.markdown("**This learner's take**")
+    a2.audio(wav_of(s.perf_midi, _mtime(s.perf_midi)), format="audio/wav")
+    with st.expander(f"🙈 What's wrong in this take? Listen first, then click to reveal ({len(s.gt)} mistakes)"):
+        if not s.gt:
+            st.write("Nothing. This take is played exactly as written.")
+        for e in s.gt:
+            st.markdown(f"- {e['description']}")
+    return {"label": f"Rondo alla Turca · {s.label}", "ref": s.ref, "perf": s.perf_midi, "gt": s.gt,
+            "case_id": s.case_id, "learner": s.learner, "piece": "rondo"}
+
+
 def pick_source() -> dict | None:
-    kind = st.radio("Input", ["Bundled example", "Eval case", "Upload"], horizontal=True, key="src_kind")
+    kind = st.radio("Input", ["Rondo alla Turca", "Bundled example", "Eval case", "Upload"], horizontal=True,
+                    key="src_kind")
+    if kind == "Rondo alla Turca":
+        return pick_rondo()
     if kind == "Bundled example":
         s = sources.bundled()
         return {"label": s.label, "ref": s.ref, "perf": s.perf_midi, "gt": s.gt}
@@ -49,7 +76,7 @@ def pick_source() -> dict | None:
         if s.perf_audio:
             if st.radio("Performance as", ["MIDI (exact)", "Audio (.wav)"], horizontal=True, key="src_as") != "MIDI (exact)":
                 perf = s.perf_audio
-        return {"label": s.label, "ref": s.ref, "perf": perf, "gt": s.gt, "case_id": s.case_id}
+        return {"label": s.label, "ref": s.ref, "perf": perf, "gt": s.gt, "case_id": s.case_id, "piece": s.piece}
     c1, c2, c3 = st.columns(3)
     ref = c1.file_uploader("Reference score (.mid)", type=["mid", "midi"], key="up_ref")
     perf = c2.file_uploader("Performance (.mid or .wav)", type=["mid", "midi", "wav"], key="up_perf")
@@ -110,6 +137,9 @@ def run(system: str, src: dict, opts: dict) -> dict:
 def show_result(res: dict) -> None:
     out, src = res["out"], res["src"]
     errors = out.get("errors", [])
+    bb = None
+    if src.get("piece") == "rondo":
+        from examples.rondo_demo import bar_beat_str as bb
     sc = C.score(src.get("gt"), errors)
     ref = notes_of(src["ref"], _mtime(src["ref"]))
     perf = None if C.is_audio(src["perf"]) else notes_of(src["perf"], _mtime(src["perf"]))
@@ -134,7 +164,7 @@ def show_result(res: dict) -> None:
 
     tabs = st.tabs(["Errors", "Feedback", "Trace", "Audio", "Raw"])
     with tabs[0]:
-        rows = C.error_rows(errors, sc["pred_status"])
+        rows = C.error_rows(errors, sc["pred_status"], bb)
         if rows:
             st.dataframe(rows, width="stretch", hide_index=True)
         else:
@@ -143,7 +173,7 @@ def show_result(res: dict) -> None:
             missed = [g for g, s in zip(src["gt"], sc["gt_status"]) if s == "missed"]
             st.markdown(f"**Known mistakes not found:** {len(missed)}")
             if missed:
-                st.dataframe(C.error_rows(missed, [None] * len(missed)), width="stretch", hide_index=True)
+                st.dataframe(C.error_rows(missed, [None] * len(missed), bb), width="stretch", hide_index=True)
     with tabs[1]:
         st.markdown(out.get("feedback") or "_This system doesn't write feedback._")
         if out.get("memory"):
@@ -187,11 +217,14 @@ if preload:
     st.stop()
 
 src = pick_source()
+st.session_state.setdefault("learner", "demo")
+if src and src.get("learner") and st.session_state.get("_learner_from") != src["learner"]:
+    st.session_state["learner"] = st.session_state["_learner_from"] = src["learner"]  # one memory per level
 c1, c2, c3 = st.columns([2, 2, 1])
 systems = C.visible_systems()
 system = c1.selectbox("System", systems, index=systems.index("agent"), format_func=lambda s: C.SYSTEM_LABELS[s],
                       key="system")
-learner = c2.text_input("Learner", value="demo", key="learner",
+learner = c2.text_input("Learner", key="learner",
                         help="The agent reads and writes this learner's mistake log.")
 write_memory = c3.checkbox("Write to memory", value=True, key="write_memory", disabled=system != "agent",
                            help="Run the same piece twice and the agent should mention the repeated mistakes.")

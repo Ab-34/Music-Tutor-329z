@@ -15,9 +15,12 @@ common.page("Simplify", "🪜")
 st.title("🪜 Simplification ladder")
 st.caption("Each rung applies one more step to the rung above it. The difficulty scores should go down as you go.")
 
-kind = st.radio("Piece", ["Bundled example", "Eval case reference", "Upload"], horizontal=True)
+kind = st.radio("Piece", ["Rondo alla Turca", "Bundled example", "Eval case reference", "Upload"], horizontal=True)
 ref_path = None
-if kind == "Bundled example":
+if kind == "Rondo alla Turca":
+    ref_path = sources.rondo_takes()[0].ref
+    st.caption("Mozart, *Rondo alla Turca* (K. 331): pickup + first 8 bars, both hands.")
+elif kind == "Bundled example":
     ref_path = sources.bundled().ref
 elif kind == "Eval case reference":
     cases = sources.eval_cases()

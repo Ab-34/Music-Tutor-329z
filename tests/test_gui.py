@@ -8,6 +8,7 @@ pytest.importorskip("plotly")
 
 from streamlit.testing.v1 import AppTest  # noqa: E402
 
+from examples.rondo_demo import bar_beat_str  # noqa: E402
 from gui import components as C  # noqa: E402
 from gui import jobs, sources  # noqa: E402
 from tutor.notes import Note  # noqa: E402
@@ -94,8 +95,30 @@ def test_page_loads(page):
 
 def test_assess_b0_finds_the_bundled_mistakes():
     at = AppTest.from_file(str(sources.ROOT / "gui/pages/1_Assess.py"), default_timeout=30).run()
+    at.radio(key="src_kind").set_value("Bundled example").run()
     at.selectbox(key="system").select("algorithmic").run()
     at.button(key="run").click().run()
     assert not at.exception, at.exception
     res = at.session_state["assess_result"]
     assert C.score(res["src"]["gt"], res["out"]["errors"])["metrics"]["recall"] == 1.0
+
+
+def test_assess_defaults_to_rondo_and_scores_a_struggling_take():
+    at = AppTest.from_file(str(sources.ROOT / "gui/pages/1_Assess.py"), default_timeout=30).run()
+    assert at.radio(key="src_kind").value == "Rondo alla Turca"
+    at.selectbox(key="rondo_level").select("struggling").run()
+    assert at.text_input(key="learner").value == "rondo_struggling"  # one memory per learner level
+    at.selectbox(key="system").select("algorithmic").run()
+    at.button(key="run").click().run()
+    assert not at.exception, at.exception
+    res = at.session_state["assess_result"]
+    assert res["src"]["piece"] == "rondo" and len(res["src"]["gt"]) >= 10
+    assert C.score(res["src"]["gt"], res["out"]["errors"])["metrics"]["f1"] == 1.0
+    rows = C.error_rows(res["out"]["errors"], [None] * len(res["out"]["errors"]), bar_beat_str)
+    assert all("bar.beat" in r for r in rows)
+
+
+def test_rondo_takes_listed_for_every_level():
+    takes = sources.rondo_takes()
+    assert {t.level for t in takes} == {"perfect", "nearly_there", "intermediate", "struggling"}
+    assert "Rondo alla Turca learners" in sources.eval_sets()

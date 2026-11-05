@@ -8,6 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 MANIFEST = ROOT / "data" / "cases" / "manifest.jsonl"
+RONDO_MANIFEST = ROOT / "examples" / "rondo" / "manifest.jsonl"
 UPLOADS = ROOT / "runs" / "gui_uploads"
 
 
@@ -20,6 +21,10 @@ class Source:
     gt: list[dict] | None = None   # known errors, if any
     case_id: str | None = None
     severity: int | None = None
+    level: str | None = None       # Rondo demo learner level
+    take: int | None = None
+    learner: str | None = None     # suggested learner name (for memory)
+    piece: str | None = None       # "rondo" -> times can be shown as bar.beat
 
 
 def _abs(p: str | None) -> str | None:
@@ -45,10 +50,37 @@ def read_manifest(manifest: Path = MANIFEST) -> list[dict]:
 def eval_cases(manifest: Path = MANIFEST) -> list[Source]:
     out = []
     for r in read_manifest(manifest):
+        if r.get("level"):  # a Rondo manifest
+            out += [s for s in rondo_takes() if s.case_id == r["case_id"]]
+            continue
         out.append(Source(f"{r['case_id']}  (severity {r['severity']}, {len(r['errors'])} errors)",
                           _abs(r["ref"]), perf_midi=_abs(r.get("perf_midi")), perf_audio=_abs(r.get("perf_audio")),
                           gt=r["errors"], case_id=r["case_id"], severity=r["severity"]))
     return out
+
+
+def rondo_takes() -> list[Source]:
+    """The Rondo alla Turca learner takes (built by `python -m examples.rondo_demo` if missing)."""
+    if not RONDO_MANIFEST.exists():
+        from examples.rondo_demo import write_all
+        write_all()
+    from examples.rondo_demo import PROFILES
+    out = []
+    for r in read_manifest(RONDO_MANIFEST):
+        n = len(r["errors"])
+        out.append(Source(f"{PROFILES[r['level']].title}, take {r['take']} ({n} mistake{'s' * (n != 1)})",
+                          _abs(r["ref"]), perf_midi=_abs(r["perf_midi"]), gt=r["errors"], case_id=r["case_id"],
+                          severity=r["severity"], level=r["level"], take=r["take"], learner=r["learner"],
+                          piece="rondo"))
+    return out
+
+
+def eval_sets() -> dict[str, Path]:
+    """Eval manifests the GUI can run on: the Rondo learners always, the perturbation set if built."""
+    sets = {"Rondo alla Turca learners": RONDO_MANIFEST}
+    if MANIFEST.exists():
+        sets["Perturbation set (data/cases)"] = MANIFEST
+    return sets
 
 
 def case_by_id(case_id: str, manifest: Path = MANIFEST) -> Source | None:

@@ -17,20 +17,23 @@ from tutor import llm  # noqa: E402
 common.page("Eval", "📊")
 st.title("📊 Evaluation runs")
 
-rows = sources.read_manifest()
-
-# ---- no eval set yet --------------------------------------------------------
-if not rows:
-    st.info("There's no eval set at `data/cases/manifest.jsonl` yet.")
-    st.markdown("For the real set, download MAESTRO and run `python -m data.make_perturbations` (see the README). "
-                "For a quick look, build a **small offline set** from the bundled example. It's MIDI only and takes about a second.")
-    if st.button("Build small eval set from the bundled example"):
-        r = subprocess.run([sys.executable, "-m", "data.make_perturbations", "--midi-dir", "examples",
-                            "--n-excerpts", "2", "--severities", "0", "1", "3", "--per-severity", "2"],
-                           cwd=sources.ROOT, capture_output=True, text=True)
-        (st.success if r.returncode == 0 else st.error)(r.stdout + r.stderr)
-        st.rerun()
-    st.stop()
+sources.rondo_takes()  # builds examples/rondo/ if it's missing
+sets = sources.eval_sets()
+set_name = st.selectbox("Eval set", list(sets), key="eval_set",
+                        help="Rondo alla Turca learners: 10 takes at 4 levels with known, audible mistakes. "
+                             "Perturbation set: random errors injected into MAESTRO (or bundled) excerpts.")
+manifest = sets[set_name]
+rows = sources.read_manifest(manifest)
+if not sources.MANIFEST.exists():
+    with st.expander("No perturbation set at `data/cases/manifest.jsonl` yet: build one"):
+        st.markdown("For the real set, download MAESTRO and run `python -m data.make_perturbations` (see the README). "
+                    "Or build a **small offline set** from the bundled example (MIDI only, about a second).")
+        if st.button("Build small perturbation set from the bundled example"):
+            r = subprocess.run([sys.executable, "-m", "data.make_perturbations", "--midi-dir", "examples",
+                                "--n-excerpts", "2", "--severities", "0", "1", "3", "--per-severity", "2"],
+                               cwd=sources.ROOT, capture_output=True, text=True)
+            (st.success if r.returncode == 0 else st.error)(r.stdout + r.stderr)
+            st.rerun()
 
 has_audio = any("perf_audio" in r for r in rows)
 st.caption(f"Eval set: {len(rows)} cases"
@@ -80,7 +83,7 @@ with st.form("launch"):
     system = c[0].selectbox("System", systems, format_func=lambda s: C.SYSTEM_LABELS[s])
     input_kind = c[1].selectbox("Input", ["midi", "audio"] if has_audio else ["midi"],
                                 help="midi = exact transcription (upper bound); audio = realistic")
-    limit = c[2].number_input("Cases (limit)", min_value=1, max_value=len(rows), value=min(5, len(rows)))
+    limit = c[2].number_input("Cases (limit)", min_value=1, max_value=len(rows), value=len(rows))
     name = c[3].text_input("Run name", value=f"gui_{time.strftime('%m%d-%H%M%S')}")
     est = jobs.estimate_cost(system, int(limit))
     spent, cap = llm.total_spend(), llm.budget()
@@ -98,7 +101,7 @@ if submitted:
         st.error('Audio input needs the audio extras: `uv pip install -e ".[audio]"`.')
     else:
         try:
-            run_dir = jobs.launch(name, system, input_kind, limit=int(limit))
+            run_dir = jobs.launch(name, system, input_kind, limit=int(limit), manifest=manifest)
             st.session_state["watch_run"] = str(run_dir)
             st.rerun()
         except RuntimeError as e:
@@ -150,6 +153,18 @@ with tab_one:
         table.append({"case": p["case_id"], "severity": r["severity"], "known": len(r["errors"]),
                       "predicted": len(p.get("errors", [])), "tp": m["tp"], "fp": m["fp"], "fn": m["fn"],
                       "cost": round(jobs.case_cost(p), 4), "sec": p.get("seconds"), "error": p.get("error", "")})
+    levels = {}
+    for t in table:
+        lv = by_id[t["case"]].get("level")
+        if lv:
+            agg = levels.setdefault(lv, [0, 0, 0])
+            agg[0] += t["tp"]; agg[1] += t["fp"]; agg[2] += t["fn"]
+    if levels:
+        from eval.grade_detection import prf
+        from examples.rondo_demo import PROFILES
+        st.markdown("**By learner level**")
+        st.dataframe([{"level": PROFILES[lv].title if lv in PROFILES else lv, **prf(*levels[lv])}
+                      for lv in PROFILES if lv in levels], hide_index=True, width="stretch")
     if table:
         st.markdown("**Cases**")
         st.dataframe(table, hide_index=True, width="stretch")
@@ -159,12 +174,12 @@ with tab_one:
             r, p = by_id[pick], next(p for p in data["preds"] if p["case_id"] == pick)
             job = json.loads((run_dir / "job.json").read_text()) if (run_dir / "job.json").exists() else {}
             audio = job.get("input") == "audio" or "_audio" in run_dir.name
-            src = sources.case_by_id(pick)
+            src = sources.case_by_id(pick, Path(job["manifest"]) if job.get("manifest") else sources.MANIFEST)
             perf = (src.perf_audio if audio else src.perf_midi) if src else None
             st.session_state["assess_preload"] = {
                 "out": p, "system": data["system"], "run": run_dir.name,
-                "src": {"label": pick, "ref": src.ref if src else r["ref"], "perf": perf or r["perf_midi"],
-                        "gt": r["errors"]}}
+                "src": {"label": src.label if src else pick, "ref": src.ref if src else r["ref"],
+                        "perf": perf or r["perf_midi"], "gt": r["errors"], "piece": src.piece if src else None}}
             st.switch_page("pages/1_Assess.py")
 
 with tab_cmp:

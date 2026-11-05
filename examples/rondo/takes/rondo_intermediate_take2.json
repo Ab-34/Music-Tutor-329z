@@ -1,0 +1,37 @@
+[
+  {
+    "type": "wrong_pitch",
+    "time": 0.0,
+    "pitch": 71,
+    "played_pitch": 76,
+    "description": "Pickup: played E5 instead of B4"
+  },
+  {
+    "type": "missed",
+    "time": 4.667,
+    "pitch": 84,
+    "description": "Bar 4, beat 1: skipped the C6"
+  },
+  {
+    "type": "timing",
+    "time": 5.667,
+    "pitch": 84,
+    "offset_ms": 230,
+    "description": "Bar 4, beat 2: hesitated, so the C6 came 230 ms late"
+  },
+  {
+    "type": "missed",
+    "time": 8.667,
+    "pitch": 83,
+    "weak_spot": true,
+    "description": "Bar 7, beat 1: skipped the B5  (weak spot: same mistake every take)"
+  },
+  {
+    "type": "wrong_pitch",
+    "time": 9.333,
+    "pitch": 79,
+    "played_pitch": 67,
+    "weak_spot": true,
+    "description": "Bar 7, beat 2: played G4 instead of G5  (weak spot: same mistake every take)"
+  }
+]

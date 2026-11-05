@@ -60,10 +60,12 @@ def score(gt: list[dict] | None, pred: list[dict]) -> dict:
     }
 
 
-def error_rows(errors: list[dict], status: list[str | None]) -> list[dict]:
+def error_rows(errors: list[dict], status: list[str | None], bar_beat=None) -> list[dict]:
+    """Table rows. `bar_beat(t) -> "3.1"` adds a bar.beat column (for pieces with a known meter)."""
     rows = []
     for e, st in zip(errors, status):
-        row = {"time (s)": round(float(e.get("time", 0)), 2), "type": e.get("type"),
+        row = {"bar.beat": bar_beat(float(e.get("time", 0)))} if bar_beat else {}
+        row |= {"time (s)": round(float(e.get("time", 0)), 2), "type": e.get("type"),
                "note": pitch_name(int(e["pitch"])) if e.get("pitch") is not None else ""}
         if e.get("played_pitch") is not None:
             row["played"] = pitch_name(int(e["played_pitch"]))
@@ -71,8 +73,8 @@ def error_rows(errors: list[dict], status: list[str | None]) -> list[dict]:
             row["offset (ms)"] = e["offset_ms"]
         if st:
             row["vs. known"] = "✅ hit" if st == "hit" else "❌ false positive"
-        if e.get("note"):
-            row["explanation"] = e["note"]
+        if e.get("note") or e.get("description"):
+            row["explanation"] = e.get("note") or e["description"]
         rows.append(row)
     return rows
 
