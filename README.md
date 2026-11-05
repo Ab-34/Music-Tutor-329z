@@ -55,6 +55,23 @@ OpenRouter model id. The default is `anthropic/claude-sonnet-5.5`.
 
 For a hard limit on the provider side as well, set a credit limit on the key in the OpenRouter dashboard.
 
+## GUI console
+
+```bash
+uv pip install -e ".[gui]"
+streamlit run gui/app.py          # opens http://localhost:8501
+```
+
+| Page | What it does |
+|---|---|
+| Assess | Run the agent, B0 or B2 on the bundled example, an eval case or an upload. Shows the agent's tool calls live, a piano roll with predicted vs. known mistakes, P/R/F1, the feedback, audio, and the cost. |
+| Simplify | Build the simplification ladder; hear each rung, see its difficulty scores, download the `.mid`. |
+| Memory | Each learner's mistake log; clear it. |
+| Eval | Launch background eval runs (cost estimate first, live progress, Stop), browse scores by type and severity, open any case in Assess, compare runs. Can build a small offline eval set from the bundled example. |
+| Spending | Every paid call by tag and model, plus cumulative spend against the budget. |
+
+Design: `docs/superpowers/specs/2026-11-05-gui-design.md`.
+
 ## Audio path (transcription, synthesis, self-check)
 
 ```bash
@@ -106,6 +123,7 @@ tutor/notes.py            Note type, MIDI I/O
 tutor/tools/              transcribe, synth, self_check, align (+error candidates), score_text, memory, simplify
 tutor/agent.py            orchestrator: tool-use loop (OpenRouter), logs a trace per run
 tutor/baselines/          algorithmic (B0), audio_llm (B1, stub), text_llm (B2)
+gui/                      Streamlit console (app.py + pages/)
 tutor/llm.py              OpenRouter client, budget ledger, cache (TUTOR_MODEL, TUTOR_BUDGET_USD)
 data/make_perturbations.py  eval set builder
 eval/                     run_eval, grade_detection, grade_transcription

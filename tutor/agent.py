@@ -173,7 +173,11 @@ RUN_BUDGET_USD = float(os.environ.get("TUTOR_RUN_BUDGET_USD", "0.50"))
 
 
 def run_agent(ref_path: str, perf_path: str, learner: str = "default", piece: str | None = None,
-              max_turns: int = 20, write_memory: bool = True) -> dict:
+              max_turns: int = 20, write_memory: bool = True, on_event=None) -> dict:
+    """Run one assessment. `on_event(dict)`, if given, is called after every model call
+    ({"kind": "llm", ...}) and every tool call ({"kind": "tool", ...}) -- the GUI uses it
+    to show the trace live. It does not change the result."""
+    emit = on_event or (lambda ev: None)
     s = Session(ref_path, perf_path, learner, piece or Path(ref_path).parent.name or Path(ref_path).stem)
     s.ref = load_midi(ref_path)
     kind = "audio recording" if s.is_audio else "MIDI performance (already symbolic; transcription is exact)"
@@ -185,7 +189,7 @@ def run_agent(ref_path: str, perf_path: str, learner: str = "default", piece: st
     usage = {"input_tokens": 0, "output_tokens": 0, "cost_usd": 0.0, "cached_calls": 0}
     stop_error = None
 
-    for _ in range(max_turns):
+    for turn in range(max_turns):
         if usage["cost_usd"] >= RUN_BUDGET_USD:
             stop_error = f"run budget of ${RUN_BUDGET_USD:.2f} reached (TUTOR_RUN_BUDGET_USD)"
             break
@@ -196,6 +200,8 @@ def run_agent(ref_path: str, perf_path: str, learner: str = "default", piece: st
         usage["cost_usd"] += resp["cost_usd"]
         usage["cached_calls"] += resp["cached"]
         msg = llm.message_of(resp)
+        emit({"kind": "llm", "turn": turn + 1, "cost_usd": resp["cost_usd"], "cached": resp["cached"],
+              "total_cost_usd": usage["cost_usd"], "text": (msg.get("content") or "")[:500]})
         if msg.get("refusal"):
             s.trace.append({"event": "refusal"})
             break
@@ -216,9 +222,12 @@ def run_agent(ref_path: str, perf_path: str, learner: str = "default", piece: st
                     raise ValueError(f"unknown tool {name!r}")
                 out = json.dumps(getattr(s, name)(**args))
                 s.trace.append({"tool": name, "input": args, "ok": True})
+                emit({"kind": "tool", "name": name, "input": args, "ok": True, "output_preview": out[:600]})
             except Exception as e:  # report tool errors back to the model
                 out = f"ERROR: {e}"
                 s.trace.append({"tool": name, "input": c["function"].get("arguments"), "ok": False, "error": str(e)})
+                emit({"kind": "tool", "name": name, "input": c["function"].get("arguments"), "ok": False,
+                      "error": str(e)})
             messages.append({"role": "tool", "tool_call_id": c["id"], "content": out})
         if s.report is not None:
             break

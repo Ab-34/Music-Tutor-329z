@@ -63,3 +63,21 @@ def test_agent_stops_at_run_budget(monkeypatch):
     out = agent.run_agent("examples/ref.mid", "examples/perf.mid", write_memory=False)
     assert "run budget" in out["error"]
     assert out["usage"]["cost_usd"] == pytest.approx(0.06)
+
+
+def test_agent_on_event_streams_llm_and_tool_events(monkeypatch):
+    script = [[_tool_call("transcribe_performance", {"backend": "oracle"}, 0)],
+              [_tool_call("submit_report", {"errors": [], "feedback": "fine"}, 1)]]
+    n = {"i": 0}
+
+    def fake_chat(messages, **kw):
+        n["i"] += 1
+        return {"choices": [{"message": {"content": "thinking", "tool_calls": script[n["i"] - 1]}}],
+                "usage": {}, "cost_usd": 0.01, "cached": False}
+
+    monkeypatch.setattr(llm, "chat", fake_chat)
+    events = []
+    out = agent.run_agent("examples/ref.mid", "examples/perf.mid", write_memory=False, on_event=events.append)
+    assert [e["kind"] for e in events] == ["llm", "tool", "llm", "tool"]
+    assert events[1]["name"] == "transcribe_performance" and events[1]["ok"]
+    assert out["feedback"] == "fine"
