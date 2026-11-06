@@ -41,12 +41,15 @@ PERFORMANCE (automatic transcription, may contain transcription errors):
 def run(ref_path: str, perf_path: str, backend: str = "basic_pitch", **_) -> dict:
     ref = load_midi(ref_path)
     perf = transcribe(perf_path, backend=backend)
-    resp = llm.create(
-        messages=[{"role": "user", "content": PROMPT.format(ref=notes_to_text(ref), perf=notes_to_text(perf))}],
-        output_config={"format": {"type": "json_schema", "schema": SCHEMA}},
+    resp = llm.chat(
+        [{"role": "user", "content": PROMPT.format(ref=notes_to_text(ref), perf=notes_to_text(perf))}],
+        response_format={"type": "json_schema", "json_schema": {"name": "report", "strict": True, "schema": SCHEMA}},
+        tag="text_llm",
     )
-    if resp.stop_reason == "refusal":
+    if llm.message_of(resp).get("refusal"):
         return {"errors": [], "feedback": "", "error": "refusal"}
     out = json.loads(llm.text_of(resp))
-    out["usage"] = {"input_tokens": resp.usage.input_tokens, "output_tokens": resp.usage.output_tokens}
+    u = resp.get("usage") or {}
+    out["usage"] = {"input_tokens": u.get("prompt_tokens", 0), "output_tokens": u.get("completion_tokens", 0),
+                    "cost_usd": resp["cost_usd"], "cached": resp["cached"]}
     return out

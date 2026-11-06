@@ -16,6 +16,7 @@ import time
 from pathlib import Path
 
 from eval.grade_detection import grade
+from tutor.llm import BudgetExceeded, total_spend
 
 SYSTEMS = ["algorithmic", "text_llm", "audio_llm", "agent"]
 
@@ -63,6 +64,10 @@ def main() -> None:
             t0 = time.time()
             try:
                 out = run(r["ref"], r[key], backend=backend)
+            except BudgetExceeded as e:  # stop the whole run; grade what we have
+                print(f"STOPPING: {e}")
+                rows = rows[:i]
+                break
             except Exception as e:
                 out = {"errors": [], "error": f"{type(e).__name__}: {e}"}
             out["case_id"] = r["case_id"]
@@ -77,6 +82,7 @@ def main() -> None:
     scores = grade(sliced, pred_path)
     (out_dir / "scores.json").write_text(json.dumps(scores, indent=2))
     print(json.dumps(scores, indent=2))
+    print(f"Total LLM spend so far (all runs): ${total_spend():.3f}  -- details: python -m tutor.llm")
 
 
 if __name__ == "__main__":

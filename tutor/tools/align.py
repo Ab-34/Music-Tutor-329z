@@ -1,8 +1,9 @@
 """Note-level alignment of a performance against a reference, and error candidates.
 
 v0 algorithm (good enough for synthetic perturbations; improve for real playing):
-  1. Fit a global linear time map perf_t = a * ref_t + b from a coarse
-     same-pitch match, so a constant offset or steady tempo change is absorbed.
+  1. Fit a global linear time map perf_t = a * ref_t + b: start from the ratio of the
+     two spans, then refit from a coarse and a fine same-pitch match, so a constant
+     offset or a steadily slower/faster player is absorbed.
   2. Greedily match same-pitch notes whose warped onsets are within `match_tol`.
   3. Unmatched ref notes -> "missed"; unmatched perf notes -> "extra".
   4. A missed + extra pair close in time -> "wrong_pitch".
@@ -33,8 +34,9 @@ def _greedy_match(ref, perf, a, b, tol):
     for i, r in enumerate(ref):
         t = a * r.onset + b
         for j, p in enumerate(perf):
-            if p.pitch == r.pitch and abs(p.onset - t) <= tol:
-                cands.append((abs(p.onset - t), i, j))
+            d = abs(p.onset - t) / a  # residual on the reference clock, like timing_tol
+            if p.pitch == r.pitch and d <= tol:
+                cands.append((d, i, j))
     cands.sort()
     used_r, used_p, pairs = set(), set(), []
     for _, i, j in cands:
@@ -43,15 +45,35 @@ def _greedy_match(ref, perf, a, b, tol):
     return pairs
 
 
+def _initial_map(ref: list[Note], perf: list[Note]) -> tuple[float, float]:
+    """First guess at the time map from the overall spans, so a uniformly slower or
+    faster player doesn't drift out of the coarse matching window."""
+    if len(ref) < 2 or len(perf) < 2:
+        return 1.0, 0.0
+    r0, r1 = min(n.onset for n in ref), max(n.onset for n in ref)
+    p0, p1 = min(n.onset for n in perf), max(n.onset for n in perf)
+    a = (p1 - p0) / (r1 - r0) if r1 > r0 else 1.0
+    if not 0.5 < a < 2.0:
+        return 1.0, 0.0
+    return a, p0 - a * r0
+
+
+def _fit(ref, perf, pairs, fallback):
+    if len(pairs) < 4:
+        return fallback
+    x = np.array([ref[i].onset for i, _ in pairs])
+    y = np.array([perf[j].onset for _, j in pairs])
+    a, b = np.polyfit(x, y, 1)
+    if not 0.5 < a < 2.0:  # implausible fit; keep the fallback scale
+        a = fallback[0]
+        b = float(np.median(y - a * x))
+    return float(a), float(b)
+
+
 def align(ref: list[Note], perf: list[Note], match_tol: float = 0.3) -> Alignment:
-    pairs = _greedy_match(ref, perf, 1.0, 0.0, match_tol * 2)
-    a, b = 1.0, 0.0
-    if len(pairs) >= 4:
-        x = np.array([ref[i].onset for i, _ in pairs])
-        y = np.array([perf[j].onset for _, j in pairs])
-        a, b = np.polyfit(x, y, 1)
-        if not 0.5 < a < 2.0:  # implausible fit; keep identity
-            a, b = 1.0, float(np.median(y - x))
+    a, b = _initial_map(ref, perf)
+    for tol in (match_tol * 2, match_tol):  # coarse match -> fit, then refine
+        a, b = _fit(ref, perf, _greedy_match(ref, perf, a, b, tol), (a, b))
     pairs = _greedy_match(ref, perf, a, b, match_tol)
     mr = {i for i, _ in pairs}
     mp = {j for _, j in pairs}

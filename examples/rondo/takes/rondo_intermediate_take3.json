@@ -1,0 +1,36 @@
+[
+  {
+    "type": "wrong_pitch",
+    "time": 3.167,
+    "pitch": 76,
+    "played_pitch": 74,
+    "description": "Bar 2, beat 2: played D5 instead of E5"
+  },
+  {
+    "type": "missed",
+    "time": 4.333,
+    "pitch": 80,
+    "description": "Bar 3, beat 2: skipped the G#5"
+  },
+  {
+    "type": "missed",
+    "time": 8.667,
+    "pitch": 83,
+    "weak_spot": true,
+    "description": "Bar 7, beat 1: skipped the B5  (weak spot: same mistake every take)"
+  },
+  {
+    "type": "wrong_pitch",
+    "time": 9.333,
+    "pitch": 79,
+    "played_pitch": 67,
+    "weak_spot": true,
+    "description": "Bar 7, beat 2: played G4 instead of G5  (weak spot: same mistake every take)"
+  },
+  {
+    "type": "extra",
+    "time": 9.833,
+    "pitch": 73,
+    "description": "Bar 7, beat 2: an extra C#5 that isn't in the score"
+  }
+]

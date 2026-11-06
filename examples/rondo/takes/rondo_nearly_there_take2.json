@@ -1,0 +1,10 @@
+[
+  {
+    "type": "wrong_pitch",
+    "time": 11.0,
+    "pitch": 77,
+    "played_pitch": 84,
+    "weak_spot": true,
+    "description": "Bar 8, beat 2: played C6 instead of F5  (weak spot: same mistake every take)"
+  }
+]

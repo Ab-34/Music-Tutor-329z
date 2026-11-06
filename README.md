@@ -24,10 +24,10 @@ which has 3 known mistakes listed in `examples/perf_errors.json`:
 python -m tutor.cli assess --ref examples/ref.mid --perf examples/perf.mid --no-llm
 ```
 
-**2. Run the agent** (needs an Anthropic API key):
+**2. Run the agent** (needs an [OpenRouter](https://openrouter.ai) API key):
 
 ```bash
-cp .env.example .env        # then put your key in ANTHROPIC_API_KEY
+cp .env.example .env        # then put your key in OPENROUTER_API_KEY
 python -m tutor.cli assess --ref examples/ref.mid --perf examples/perf.mid --learner demo
 python -m tutor.cli memory --learner demo      # the mistakes the agent logged
 ```
@@ -41,6 +41,54 @@ python -m tutor.cli simplify --ref examples/ref.mid --out runs/simplified
 ```
 
 **4. Tests:** `pytest -q`
+
+## Models and budget
+
+All LLM calls go through `tutor/llm.py` to OpenRouter's OpenAI-compatible API. `TUTOR_MODEL` takes any
+OpenRouter model id. The default is `anthropic/claude-sonnet-5.5`.
+
+- **Total cap:** every paid call is logged to `llm_ledger.jsonl`. Once the total reaches `TUTOR_BUDGET_USD`,
+  new calls raise `BudgetExceeded` and `eval.run_eval` stops and grades the cases it finished.
+- **Cap per agent run:** `TUTOR_RUN_BUDGET_USD` (default $0.50) stops a single assessment that loops for too long.
+- **Cache:** identical requests are answered from `.llm_cache/` for free. Set `TUTOR_CACHE=0` to turn it off.
+- **Report:** `python -m tutor.llm` shows spending by tag and model.
+
+For a hard limit on the provider side as well, set a credit limit on the key in the OpenRouter dashboard.
+
+## GUI console
+
+```bash
+uv pip install -e ".[gui]"
+streamlit run gui/app.py          # opens http://localhost:8501
+```
+
+| Page | What it does |
+|---|---|
+| Assess | Run the agent, B0 or B2 on the bundled example, an eval case or an upload. Shows the agent's tool calls live, a piano roll with predicted vs. known mistakes, P/R/F1, the feedback, audio, and the cost. |
+| Simplify | Build the simplification ladder; hear each rung, see its difficulty scores, download the `.mid`. |
+| Memory | Each learner's mistake log; clear it. |
+| Eval | Launch background eval runs (cost estimate first, live progress, Stop), browse scores by type and severity, open any case in Assess, compare runs. Can build a small offline eval set from the bundled example. |
+| Spending | Every paid call by tag and model, plus cumulative spend against the budget. |
+
+Design: `docs/superpowers/specs/2026-11-05-gui-design.md`.
+
+## Demo learners: Rondo alla Turca
+
+`examples/rondo/` holds the pickup and the first 8 bars of Mozart's *Rondo alla Turca* (K. 331), taken from the
+public-domain [Mutopia Project](https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=108) score MIDI (see
+`examples/rondo/source/SOURCE.md`) and played at 90 bpm. There are 10 takes by learners at four levels, each mistake
+labelled in plain English (for example "Bar 3, beat 1: played D5 instead of B5"):
+
+| Level | Mistakes per take | Notes |
+|---|---|---|
+| Perfect | 0 | Checks that the system doesn't invent errors |
+| Nearly there | 1 | One clear slip |
+| Intermediate | 5–6 | Wrong and skipped notes, a hesitation, plays 10% slower |
+| Struggling | 12–14 | Plays 30% slower, with many wrong and skipped notes, hesitations and stray notes |
+
+Each level has fixed *weak spots* that repeat in every take, so the agent's memory has something to notice. The takes
+are the GUI's default input, and you can listen before revealing what's wrong. They also form an eval set
+(`examples/rondo/manifest.jsonl`). To regenerate them: `python -m examples.rondo_demo`.
 
 ## Audio path (transcription, synthesis, self-check)
 
@@ -91,9 +139,10 @@ Transcription quality on its own: `python -m eval.grade_transcription --manifest
 ```
 tutor/notes.py            Note type, MIDI I/O
 tutor/tools/              transcribe, synth, self_check, align (+error candidates), score_text, memory, simplify
-tutor/agent.py            orchestrator: tool-use loop with Claude, logs a trace per run
+tutor/agent.py            orchestrator: tool-use loop (OpenRouter), logs a trace per run
 tutor/baselines/          algorithmic (B0), audio_llm (B1, stub), text_llm (B2)
-tutor/llm.py              model settings (TUTOR_MODEL, TUTOR_EFFORT)
+gui/                      Streamlit console (app.py + pages/)
+tutor/llm.py              OpenRouter client, budget ledger, cache (TUTOR_MODEL, TUTOR_BUDGET_USD)
 data/make_perturbations.py  eval set builder
 eval/                     run_eval, grade_detection, grade_transcription
 examples/                 bundled quick-start example (+ make_example.py to regenerate it)
@@ -103,12 +152,10 @@ examples/                 bundled quick-start example (+ make_example.py to rege
 
 - MAESTRO is *performance* MIDI with no reliable bar lines, so we locate errors in seconds,
   not measures.
-- Alignment is v0: a global linear time map plus greedy same-pitch matching. Real players vary
+- Alignment is v0: a global linear time map (started from the ratio of the two durations, so a uniformly slower player is handled) plus greedy same-pitch matching. Real players vary
   their tempo locally; DTW-based alignment is the planned upgrade.
 - With `--input midi`, the algorithmic baseline is already near-perfect on synthetic
   perturbations. The agent should add value on audio, where transcription errors look like
   player errors.
 - Synthesized audio is cleaner than real recordings. We also evaluate on a small set of real
   recordings we made ourselves.
-- `tutor/llm.py` turns on Anthropic's server-side refusal fallback (`fallbacks="default"`) so a
-  rare safety-classifier decline doesn't fail an eval case. Delete those two lines to turn it off.
