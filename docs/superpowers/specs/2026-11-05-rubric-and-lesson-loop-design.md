@@ -2,6 +2,14 @@
 
 Status: design approved in brainstorming. Next step: an implementation plan.
 
+> **Update (later the same day):** these parts were replaced after user feedback, to keep the decisions in the agent:
+> - **Lesson GUI page and separate LLM coach:** replaced by one Tutor page (`gui/views/tutor.py`). There the tutor
+>   agent (`tutor/tutor_agent.py`) takes a real recording (from the browser mic or an upload), scores it with this
+>   rubric, and decides the next assignment with tools.
+> - **Chunks, levels and the rules baseline:** still used. The agent uses the chunks and levels as tools, and the
+>   rules policy is still the baseline in `eval/run_lessons.py` (`--policy rules|agent`).
+> - **Simulated learner:** still used, but only for evaluation and an optional "simulate a take" input.
+
 ## Goal
 Turn the assessor into a tutor that acts on how good a performance was:
 

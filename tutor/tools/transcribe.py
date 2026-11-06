@@ -49,6 +49,6 @@ def _basic_pitch(path, start, end, onset_threshold, frame_threshold, min_note_ms
         for n in inst.notes:
             if n.start < start or (end is not None and n.start >= end):
                 continue
-            notes.append(Note(n.pitch, n.start, n.end, n.velocity))
+            notes.append(Note(int(n.pitch), float(n.start), float(n.end), int(n.velocity)))  # plain types, not numpy
     notes.sort(key=lambda n: (n.onset, n.pitch))
     return notes

@@ -180,7 +180,7 @@ with tab_one:
                 "out": p, "system": data["system"], "run": run_dir.name,
                 "src": {"label": src.label if src else pick, "ref": src.ref if src else r["ref"],
                         "perf": perf or r["perf_midi"], "gt": r["errors"], "piece": src.piece if src else None}}
-            st.switch_page("pages/1_Assess.py")
+            st.switch_page("views/assess.py")
 
 with tab_cmp:
     chosen = st.multiselect("Runs", runs, default=runs[: min(3, len(runs))],

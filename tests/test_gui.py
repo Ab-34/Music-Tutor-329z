@@ -86,16 +86,15 @@ def test_estimate_cost_averages_past_cases(tmp_path):
 
 # ---- page smoke tests -------------------------------------------------------
 
-@pytest.mark.parametrize("page", ["gui/app.py", "gui/pages/1_Assess.py", "gui/pages/2_Simplify.py",
-                                  "gui/pages/3_Memory.py", "gui/pages/4_Eval.py", "gui/pages/5_Spending.py",
-                                  "gui/pages/6_Lesson.py"])
+@pytest.mark.parametrize("page", ["gui/app.py", "gui/views/tutor.py", "gui/views/assess.py",
+                                  "gui/views/eval.py", "gui/views/spending.py"])
 def test_page_loads(page):
     at = AppTest.from_file(str(sources.ROOT / page), default_timeout=30).run()
     assert not at.exception, at.exception
 
 
 def test_assess_b0_finds_the_bundled_mistakes():
-    at = AppTest.from_file(str(sources.ROOT / "gui/pages/1_Assess.py"), default_timeout=30).run()
+    at = AppTest.from_file(str(sources.ROOT / "gui/views/assess.py"), default_timeout=30).run()
     at.radio(key="src_kind").set_value("Bundled example").run()
     at.selectbox(key="system").select("algorithmic").run()
     at.button(key="run").click().run()
@@ -105,7 +104,7 @@ def test_assess_b0_finds_the_bundled_mistakes():
 
 
 def test_assess_defaults_to_rondo_and_scores_a_struggling_take():
-    at = AppTest.from_file(str(sources.ROOT / "gui/pages/1_Assess.py"), default_timeout=30).run()
+    at = AppTest.from_file(str(sources.ROOT / "gui/views/assess.py"), default_timeout=30).run()
     assert at.radio(key="src_kind").value == "Rondo alla Turca"
     at.selectbox(key="rondo_level").select("struggling").run()
     assert at.text_input(key="learner").value == "rondo_struggling"  # one memory per learner level
@@ -125,23 +124,39 @@ def test_rondo_takes_listed_for_every_level():
     assert "Rondo alla Turca learners" in sources.eval_sets()
 
 
-def test_lesson_page_steps_through_a_rules_lesson():
-    at = AppTest.from_file(str(sources.ROOT / "gui/pages/6_Lesson.py"), default_timeout=60).run()
-    assert not at.exception, at.exception
-    at.button(key="lesson_new").click().run()
-    for _ in range(3):
-        at.button(key="lesson_step").click().run()
-    assert not at.exception, at.exception
-    assert len(at.session_state["lesson"].rows) == 3
-    at.button(key="lesson_run").click().run()
-    assert not at.exception, at.exception
-    assert at.session_state["lesson"].done
-
-
-def test_assess_rubric_card_offers_a_lesson_for_a_struggling_take():
-    at = AppTest.from_file(str(sources.ROOT / "gui/pages/1_Assess.py"), default_timeout=30).run()
+def test_assess_rubric_card_puts_a_struggling_take_in_the_chunk_band():
+    at = AppTest.from_file(str(sources.ROOT / "gui/views/assess.py"), default_timeout=30).run()
     at.selectbox(key="rondo_level").select("struggling").run()
     at.selectbox(key="system").select("algorithmic").run()
     at.button(key="run").click().run()
     assert not at.exception, at.exception
-    assert any(b.key == "start_lesson" for b in at.button)
+    assert any("beginner lesson" in e.value for e in at.error)
+
+
+def test_tutor_page_sends_a_take_and_shows_the_next_assignment(tmp_path, monkeypatch):
+    import json as _json
+
+    from tutor import llm
+    from tutor.tools import memory
+    monkeypatch.setattr(memory, "ROOT", tmp_path / "memory")
+    steps = [[("transcribe_recording", {})], [("compare_to_assignment", {})], [("score_performance", {})],
+             [("finish_turn", {"decision": "beginner_lesson", "feedback": "Start with bars 1-2.",
+                               "next_scope": "0", "next_level": "beginner", "reason": "far off"})]]
+    calls = {"n": 0}
+
+    def chat(messages, **kw):
+        calls["n"] += 1
+        tc = [{"id": f"c{calls['n']}_{j}", "type": "function",
+               "function": {"name": n, "arguments": _json.dumps(a)}} for j, (n, a) in enumerate(steps[calls["n"] - 1])]
+        return {"choices": [{"message": {"content": "", "tool_calls": tc}}], "usage": {}, "cost_usd": 0.0,
+                "cached": False}
+
+    monkeypatch.setattr(llm, "chat", chat)
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test")
+    at = AppTest.from_file(str(sources.ROOT / "gui/views/tutor.py"), default_timeout=60).run()
+    at.selectbox(key="sim_level").select("struggling").run()
+    at.checkbox(key="sim_me_0").check().run()
+    at.button(key="send").click().run()
+    assert not at.exception, at.exception
+    assert at.session_state["tutor_last"]["me"]["decision"] == "beginner_lesson"
+    assert any("chunk 1 of 4" in m.value for m in at.markdown)      # the new assignment is shown

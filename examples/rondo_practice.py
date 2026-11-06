@@ -64,12 +64,12 @@ def _q(x: float, step: float = 0.25) -> float:
     return round(x / step) * step
 
 
-def bars(notes: list[Note], spb: float) -> list[dict]:
+def bars(notes: list[Note], spb: float, beat_of=None) -> list[dict]:
     """Group a single-note line into bars of tiles. Units are sixteenth notes."""
     out: dict[int, dict] = {}
     graces: list[Note] = []
     for i, n in enumerate(sorted(notes, key=lambda n: n.onset)):
-        beat = n.onset / spb - PICKUP_BEATS
+        beat = beat_of(n.onset) if beat_of else n.onset / spb - PICKUP_BEATS  # beats from bar 1
         dur = (n.offset - n.onset) / spb
         if dur < 0.15:          # grace note: drawn small, above the note it leads into
             graces.append(n)
@@ -111,7 +111,7 @@ def section(v: dict) -> str:
     notes = sorted(v["notes"], key=lambda n: n.onset)
     idx = {id(n): i for i, n in enumerate(notes)}
     rows = []
-    for b in bars(notes, spb):
+    for b in bars(notes, spb, v.get("beat_of")):
         cells = "".join(f'<span class="slot rest" style="--u:{it["rest"]}" aria-label="rest"></span>' if "rest" in it
                         else tile(it["note"], it["units"], it["graces"], idx) for it in b["items"])
         label = "Pickup" if b["bar"] == 0 else f"Bar {b['bar']}"

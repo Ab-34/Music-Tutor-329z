@@ -1,10 +1,12 @@
 """Chunked practice loop: split a piece into chunks, climb each chunk's ladder, move on.
 
-    lesson = Lesson(rondo_piece(), learner, CoachPolicy())   # or RulesPolicy()
+    lesson = Lesson(rondo_piece(), learner, RulesPolicy())
     while not lesson.done:
         row = lesson.step()        # one attempt: play -> align -> rubric -> decide -> apply
 
-Each chunk has RUNGS (easiest first). A policy picks an action after every attempt:
+This is the toolkit the tutor agent (tutor/tutor_agent.py) uses: chunks, levels (RUNGS) and
+targets. The Lesson controller with RulesPolicy is the fixed-rules baseline the agent is compared
+against in eval/run_lessons.py. Each chunk has RUNGS (easiest first). A policy picks an action after every attempt:
 repeat / easier / harder / next_chunk / finish. Guardrails turn impossible actions into the
 nearest possible one and cap attempts per chunk. Every attempt is logged to
 runs/lessons/<lesson_id>.jsonl.
@@ -180,68 +182,6 @@ class RulesPolicy:
         action, reason = rules_action(state, rub, rung_scores + [rub.total])
         return {"action": action, "suggested": action, "reason": reason, "feedback": template_feedback(rub, descs),
                 "fallback": False, "cost_usd": 0.0}
-
-
-COACH_SYSTEM = f"""You are a patient piano coach running a practice loop for a learner who plays one note at a time.
-The piece is split into chunks; each chunk has levels (rungs), easiest first. After each attempt you see a rubric
-score (0-100) and the mistakes, and you choose the next step:
-- repeat: same chunk, same level
-- easier: same chunk, one level easier
-- harder: same chunk, one level harder (from the top level this moves on to the next chunk)
-- next_chunk: start the next chunk at the easiest level
-- finish: end the lesson (only once the last chunk is done)
-Pass mark is {rubric.POLISH_AT}. Default to the suggested action. You may choose differently when the history
-justifies it, e.g. repeat after a pass if the same weak spot keeps coming back, move on at a slightly lower score after
-steady progress, or go easier sooner if the learner is stuck. Always explain your choice in one sentence.
-Feedback: at most two short sentences, addressed to the learner, naming the bar, beat and notes to fix.
-Reply with JSON only."""
-
-COACH_SCHEMA = {
-    "type": "object",
-    "properties": {"action": {"type": "string", "enum": ACTIONS}, "feedback": {"type": "string"},
-                   "reason": {"type": "string"}},
-    "required": ["action", "feedback", "reason"],
-    "additionalProperties": False,
-}
-
-
-class CoachPolicy:
-    name = "llm"
-
-    def __init__(self, model: str | None = None):
-        self.model = model
-        self.rules = RulesPolicy()
-
-    def decide(self, state: State, tgt: Target, rub: rubric.Rubric, descs: list[str], history: list[dict]) -> dict:
-        base = self.rules.decide(state, tgt, rub, descs, history)
-        recent = [{"level": RUNGS[h["rung"]][0], "score": h["rubric"]["total"], "action": h["action"]}
-                  for h in history if h["chunk"] == state.chunk][-5:]
-        info = {
-            "chunk": f"{state.chunk + 1} of {state.n_chunks} ({tgt.chunk.label})",
-            "level": f"{state.rung + 1} of {len(RUNGS)}: {RUNGS[state.rung][1]}",
-            "attempts_on_this_chunk": state.attempts_on_chunk,
-            "rubric": {"total": rub.total, "band": rub.band, "parts": rub.parts, "worst_bars": rub.worst_bars},
-            "mistakes": descs,
-            "earlier_attempts_on_this_chunk": recent,
-            "suggested_action": base["suggested"],
-            "suggestion_reason": base["reason"],
-        }
-        try:
-            resp = llm.chat([{"role": "system", "content": COACH_SYSTEM},
-                             {"role": "user", "content": json.dumps(info, indent=1)}],
-                            response_format={"type": "json_schema",
-                                             "json_schema": {"name": "coach", "strict": True, "schema": COACH_SCHEMA}},
-                            model=self.model, max_tokens=4000, tag="coach")
-            out = json.loads(llm.text_of(resp))
-            if out.get("action") not in ACTIONS:
-                raise ValueError(f"invalid action {out.get('action')!r}")
-            return {"action": out["action"], "suggested": base["suggested"], "reason": out["reason"],
-                    "feedback": out["feedback"], "fallback": False, "cost_usd": resp["cost_usd"]}
-        except llm.BudgetExceeded:
-            raise
-        except Exception as e:  # bad JSON / invalid action / API error -> follow the rules
-            base.update(fallback=True, reason=f"coach failed ({type(e).__name__}: {e}); used the rules: {base['reason']}")
-            return base
 
 
 # ---- the controller ---------------------------------------------------------

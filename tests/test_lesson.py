@@ -1,11 +1,11 @@
-"""Rubric, chunks, simulated learner, policies and guardrails for the practice loop (no network)."""
+"""Rubric, chunks, simulated learner, and the rules baseline with its guardrails (no network)."""
 import json
 
 import pytest
 
 from examples.rondo_learner import SimLearner
 from tutor import lesson as L
-from tutor import llm, rubric
+from tutor import rubric
 from tutor.notes import Note
 from tutor.tools.align import find_errors
 
@@ -96,36 +96,3 @@ def test_guardrails():
 def test_rules_lesson_finishes(level):
     s = L.Lesson(PIECE, SimLearner(level, 0), L.RulesPolicy(), log_dir=None).run()
     assert s["finished"] and s["chunks_passed"] >= 3 and s["cost_usd"] == 0
-
-
-def _fake_chat(reply):
-    def chat(messages, **kw):
-        assert kw["tag"] == "coach" and "suggested_action" in messages[-1]["content"]
-        return {"choices": [{"message": {"content": reply}}], "cost_usd": 0.001, "cached": False}
-    return chat
-
-
-def test_coach_is_followed_and_logged(monkeypatch, tmp_path):
-    monkeypatch.setattr(llm, "chat", _fake_chat(json.dumps(
-        {"action": "harder", "feedback": "Good. Now all the notes.", "reason": "steady"})))
-    lesson = L.Lesson(PIECE, SimLearner("struggling", 0), L.CoachPolicy(), log_dir=tmp_path)
-    row = lesson.step()
-    assert row["action"] == "harder" and lesson.state.rung == 1 and not row["fallback"]
-    assert row["chosen"] != row["suggested"]           # rules would have repeated a low score
-    assert json.loads(lesson.log.read_text().splitlines()[0])["feedback"] == "Good. Now all the notes."
-
-
-@pytest.mark.parametrize("reply", ["not json", json.dumps({"action": "teleport", "feedback": "", "reason": ""})])
-def test_coach_falls_back_to_rules(monkeypatch, reply):
-    monkeypatch.setattr(llm, "chat", _fake_chat(reply))
-    lesson = L.Lesson(PIECE, SimLearner("struggling", 0), L.CoachPolicy(), log_dir=None)
-    row = lesson.step()
-    assert row["fallback"] and row["action"] == row["suggested"]
-
-
-def test_coach_harder_at_top_rung_moves_on(monkeypatch):
-    monkeypatch.setattr(llm, "chat", _fake_chat(json.dumps({"action": "harder", "feedback": "", "reason": ""})))
-    lesson = L.Lesson(PIECE, SimLearner("nearly_there", 0), L.CoachPolicy(), log_dir=None)
-    lesson.state.rung = len(L.RUNGS) - 1
-    row = lesson.step()
-    assert row["action"] == "next_chunk" and row["guard"] == "top level passed" and lesson.state.chunk == 1

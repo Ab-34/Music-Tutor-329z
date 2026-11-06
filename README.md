@@ -55,22 +55,29 @@ OpenRouter model id. The default is `anthropic/claude-sonnet-5.5`.
 
 For a hard limit on the provider side as well, set a credit limit on the key in the OpenRouter dashboard.
 
-## GUI console
+## GUI
 
 ```bash
-uv pip install -e ".[gui]"
-streamlit run gui/app.py          # opens http://localhost:8501
+uv pip install -e ".[gui,audio]"     # audio = Basic Pitch transcription, for recordings
+streamlit run gui/app.py             # opens http://localhost:8501
 ```
 
-| Page | What it does |
-|---|---|
-| Assess | Run the agent, B0 or B2 on the bundled example, an eval case or an upload. Shows the agent's tool calls live, a piano roll with predicted vs. known mistakes, P/R/F1, the feedback, audio, and the cost. |
-| Simplify | Build the simplification ladder; hear each rung, see its difficulty scores, download the `.mid`. |
-| Memory | Each learner's mistake log; clear it. |
-| Eval | Launch background eval runs (cost estimate first, live progress, Stop), browse scores by type and severity, open any case in Assess, compare runs. Can build a small offline eval set from the bundled example. |
-| Spending | Every paid call by tag and model, plus cumulative spend against the budget. |
+**Learn the Rondo** is the app: one page where the tutor agent does everything. You see your current assignment as
+piano-key tiles you can listen to. You play it, then **record it in the browser** or upload a `.wav` or `.mid`, and
+send it to the tutor. The agent (`tutor/tutor_agent.py`):
+1. transcribes the recording and checks the transcription
+2. aligns it to the assignment and scores it with the rubric
+3. reads your history: earlier attempts and mistakes that keep coming back
+4. previews easier or harder versions if it wants to
+5. decides what you do next: precise feedback if you're close, an easier version of the whole piece if you're partway
+   there, or a beginner lesson in 2-bar chunks if you're far off
 
-Design: `docs/superpowers/specs/2026-11-05-gui-design.md`.
+Inside a lesson it repeats a chunk, makes it easier or harder, or moves to the next chunk. Progress and mistakes are
+saved per learner name (`memory_store/`), so the next recording, or the next session, carries on where you left off.
+There's also a "simulate a take" option for trying it without an instrument.
+
+The **Developer** section of the sidebar has: Assess (run one system on a take and compare it with the known
+mistakes), Eval runs, and Spending.
 
 ## Demo learners: Rondo alla Turca
 
@@ -92,25 +99,30 @@ are the GUI's default input, and you can listen before revealing what's wrong. T
 
 ## Rubric and practice lessons
 
-Every assessment gets a **rubric score** (`tutor/rubric.py`): four parts (right notes 35%, complete 30%, rhythm 20%,
-clean 15%), each dropping to 0 once 5% of the notes (at least 2) have that kind of mistake. The score's band decides
-what the tutor does:
+The tutor scores every attempt with a rubric (`tutor/rubric.py`). It has four parts: right notes 35%, complete 30%,
+rhythm 20%, clean 15%. Each part drops to 0 once 5% of the notes (at least 2) have that kind of mistake. The bands
+guide the agent's decision:
 
-| Score | Band | Tutor action |
+| Score | Band | What the tutor usually does |
 |---|---|---|
 | ≥ 85 | polish | Precise note-by-note feedback |
-| 50–84 | simplify | A simplified version of the same passage to learn first |
-| < 50 | chunk | A **practice lesson**: 2-bar chunks, starting simplified |
+| 50–84 | simplify | An easier version of the same passage |
+| < 50 | chunk | A beginner lesson: 2-bar chunks, starting simplified |
 
-In a lesson (`tutor/lesson.py`), each chunk climbs three levels: simplified, all notes slowly, all notes at full
-tempo. After each attempt a policy chooses to repeat, go easier, go harder or move on. The `rules` policy is the
-baseline; the `llm` coach makes one LLM call per attempt and may override the rules if it explains why. Attempts come
-from simulated learners who improve with practice (`examples/rondo_learner.py`). Try it on the GUI's **Lesson** page,
-or compare the policies:
+Levels per passage (`tutor/lesson.py`):
+
+| Level | Notes | Tempo |
+|---|---|---|
+| beginner | runs thinned, no grace notes | 60 bpm |
+| intermediate | all notes | 60 bpm |
+| full | all notes | 90 bpm |
+
+To compare the agent with a fixed-rules baseline on simulated learners who improve with practice
+(`examples/rondo_learner.py`):
 
 ```bash
-python -m eval.run_lessons --policy rules --seeds 5               # free
-python -m eval.run_lessons --policy llm --levels struggling --seeds 1   # roughly $0.10 per lesson
+python -m eval.run_lessons --policy rules --seeds 5                       # free
+python -m eval.run_lessons --policy agent --levels struggling --seeds 1   # one agent turn per attempt, ~$0.04 each
 ```
 
 ## Audio path (transcription, synthesis, self-check)
@@ -164,7 +176,7 @@ tutor/notes.py            Note type, MIDI I/O
 tutor/tools/              transcribe, synth, self_check, align (+error candidates), score_text, memory, simplify
 tutor/agent.py            orchestrator: tool-use loop (OpenRouter), logs a trace per run
 tutor/baselines/          algorithmic (B0), audio_llm (B1, stub), text_llm (B2)
-gui/                      Streamlit console (app.py + pages/)
+gui/                      Streamlit app (app.py + views/: tutor, assess, eval, spending)
 tutor/llm.py              OpenRouter client, budget ledger, cache (TUTOR_MODEL, TUTOR_BUDGET_USD)
 data/make_perturbations.py  eval set builder
 eval/                     run_eval, grade_detection, grade_transcription

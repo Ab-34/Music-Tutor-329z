@@ -186,14 +186,31 @@ def run_agent(ref_path: str, perf_path: str, learner: str = "default", piece: st
                 {"role": "user", "content":
                  f"Learner: {learner}. Piece: {s.piece} ({duration:.1f} s, {len(s.ref)} notes). "
                  f"Performance is a {kind}. Assess it and submit your report."}]
-    usage = {"input_tokens": 0, "output_tokens": 0, "cost_usd": 0.0, "cached_calls": 0}
-    stop_error = None
+    usage, stop_error = tool_loop(messages, OAI_TOOLS, s, done=lambda: s.report is not None,
+                                  nudge="Please call submit_report with your findings.", tag="agent",
+                                  max_turns=max_turns, emit=emit)
 
+    report = s.report or {"errors": [], "feedback": "", "error": stop_error or "agent did not submit a report"}
+    if write_memory and report.get("errors"):
+        report["memory"] = memory.write(learner, s.piece, report["errors"])
+    report["trace"] = s.trace
+    report["usage"] = usage
+    return report
+
+
+def tool_loop(messages: list[dict], tools: list[dict], session, done, nudge: str, tag: str,
+              max_turns: int = 20, emit=None, run_budget: float | None = None) -> tuple[dict, str | None]:
+    """The shared tool-use loop: call the model, run the tools it asks for on `session`
+    (a method per tool name), feed results back, stop when `done()` or out of turns/budget.
+    Every call is appended to `session.trace` and reported through `emit`."""
+    emit = emit or (lambda ev: None)
+    names = {t["function"]["name"] for t in tools}
+    cap = RUN_BUDGET_USD if run_budget is None else run_budget
+    usage = {"input_tokens": 0, "output_tokens": 0, "cost_usd": 0.0, "cached_calls": 0}
     for turn in range(max_turns):
-        if usage["cost_usd"] >= RUN_BUDGET_USD:
-            stop_error = f"run budget of ${RUN_BUDGET_USD:.2f} reached (TUTOR_RUN_BUDGET_USD)"
-            break
-        resp = llm.chat(messages, tools=OAI_TOOLS, tag="agent")
+        if usage["cost_usd"] >= cap:
+            return usage, f"run budget of ${cap:.2f} reached (TUTOR_RUN_BUDGET_USD)"
+        resp = llm.chat(messages, tools=tools, tag=tag)
         u = resp.get("usage") or {}
         usage["input_tokens"] += u.get("prompt_tokens", 0)
         usage["output_tokens"] += u.get("completion_tokens", 0)
@@ -203,38 +220,33 @@ def run_agent(ref_path: str, perf_path: str, learner: str = "default", piece: st
         emit({"kind": "llm", "turn": turn + 1, "cost_usd": resp["cost_usd"], "cached": resp["cached"],
               "total_cost_usd": usage["cost_usd"], "text": (msg.get("content") or "")[:500]})
         if msg.get("refusal"):
-            s.trace.append({"event": "refusal"})
-            break
+            session.trace.append({"event": "refusal"})
+            return usage, "the model refused"
         calls = msg.get("tool_calls") or []
         messages.append({"role": "assistant", "content": msg.get("content") or "",
                          **({"tool_calls": [{"id": c["id"], "type": "function", "function": c["function"]}
                                             for c in calls]} if calls else {})})
         if not calls:
-            if s.report is None:  # nudge if it answered in prose
-                messages.append({"role": "user", "content": "Please call submit_report with your findings."})
+            if not done():  # nudge if it answered in prose
+                messages.append({"role": "user", "content": nudge})
                 continue
-            break
+            return usage, None
         for c in calls:
             name = c["function"]["name"]
             try:
                 args = json.loads(c["function"].get("arguments") or "{}")
-                if name not in TOOL_NAMES:
+                if name not in names:
                     raise ValueError(f"unknown tool {name!r}")
-                out = json.dumps(getattr(s, name)(**args))
-                s.trace.append({"tool": name, "input": args, "ok": True})
+                out = json.dumps(getattr(session, name)(**args), default=float)
+                session.trace.append({"tool": name, "input": args, "ok": True})
                 emit({"kind": "tool", "name": name, "input": args, "ok": True, "output_preview": out[:600]})
             except Exception as e:  # report tool errors back to the model
                 out = f"ERROR: {e}"
-                s.trace.append({"tool": name, "input": c["function"].get("arguments"), "ok": False, "error": str(e)})
+                session.trace.append({"tool": name, "input": c["function"].get("arguments"), "ok": False,
+                                      "error": str(e)})
                 emit({"kind": "tool", "name": name, "input": c["function"].get("arguments"), "ok": False,
                       "error": str(e)})
             messages.append({"role": "tool", "tool_call_id": c["id"], "content": out})
-        if s.report is not None:
-            break
-
-    report = s.report or {"errors": [], "feedback": "", "error": stop_error or "agent did not submit a report"}
-    if write_memory and report.get("errors"):
-        report["memory"] = memory.write(learner, s.piece, report["errors"])
-    report["trace"] = s.trace
-    report["usage"] = usage
-    return report
+        if done():
+            return usage, None
+    return usage, None

@@ -10,3 +10,4 @@ runs/
 memory_store/
 llm_ledger.jsonl
 .llm_cache/
+.DS_Store

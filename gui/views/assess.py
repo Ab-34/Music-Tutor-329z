@@ -16,6 +16,7 @@ from tutor.notes import load_midi  # noqa: E402
 
 common.page("Assess", "🔎")
 st.title("🔎 Assess a performance")
+st.caption("Developer view: run one system on a take and compare its errors with the known mistakes.")
 
 
 @st.cache_data(show_spinner=False)
@@ -174,11 +175,8 @@ def rubric_card(src: dict, ref, perf, errors: list[dict]) -> None:
             if rondo:
                 st.caption("To read the notes, open the practice sheet: `examples/rondo/practice.html`.")
         else:
-            st.error(msg + " The tutor will split it into 2-bar chunks, start you on a simplified first chunk, "
-                     "and decide after each attempt whether to repeat it, make it easier or harder, or move on.")
-            if st.button("Start a lesson", type="primary", key="start_lesson"):
-                st.session_state["lesson_level"] = src.get("level") or "struggling"
-                st.switch_page("pages/6_Lesson.py")
+            st.error(msg + " On the Tutor page, the tutor would start a beginner lesson: 2-bar chunks, the "
+                     "first one simplified.")
         if r.worst_bars:
             st.caption("Most mistakes in: " + ", ".join(f"bar {w['bar']} ({w['errors']})" for w in r.worst_bars))
 
