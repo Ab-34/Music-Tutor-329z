@@ -1,0 +1,266 @@
+{
+  "Rondo alla Turca": {
+    "assignment": {
+      "scope": 0,
+      "level": "beginner"
+    },
+    "history": [
+      {
+        "assignment": {
+          "scope": "whole",
+          "level": "full"
+        },
+        "score": 55,
+        "band": "simplify",
+        "decision": "beginner_lesson",
+        "feedback": "Thanks for sending this, Chinmay. This attempt doesn't match the written passage yet, so let's slow down and build it up. The recording starts at about bar 1, beat 2, so the pickup (B4 A4 G#4 A4) is missing. Your line also sits around D5 to E5 and doesn't reach the high B5, A5 and C6 runs in bars 3-6. We'll begin with just the first two bars in a simplified form. Start on B4, play the pickup into C5, then D5, and go on from there at a slow, steady pace.",
+        "reason": "The score was 0 (chunk band) on the whole excerpt at full level, so I'm starting a chunk lesson with the first two bars at beginner level.",
+        "next_assignment": {
+          "scope": 0,
+          "level": "beginner"
+        },
+        "recording": "/Users/chinmaymrp/Stanford/Coursework/CS329Z_Project/Music-Tutor-329z/runs/tutor_recordings/Chinmay/20261106-000205.wav"
+      },
+      {
+        "assignment": {
+          "scope": 0,
+          "level": "beginner"
+        },
+        "score": 100,
+        "band": "polish",
+        "decision": "harder",
+        "feedback": "Nice work, Chinmay! The pickup and bars 1-2 were all correct: B4, G#4, C5, D5, B4, E5, F5, D#5. This time the pickup wasn't skipped, which was a problem in your earlier attempts. Now let's add the quick notes and ornaments back in. Play the same two bars with every note, still slowly. Keep the pickup even, and don't rush into the E5 in bar 2.",
+        "reason": "The beginner version of the pickup and bars 1-2 scored 100, so the next step is the same chunk with all the notes.",
+        "next_assignment": {
+          "scope": 0,
+          "level": "intermediate"
+        },
+        "recording": "/Users/chinmaymrp/Stanford/Coursework/CS329Z_Project/Music-Tutor-329z/runs/tutor_recordings/Chinmay/20261106-000256.wav"
+      },
+      {
+        "assignment": {
+          "scope": 0,
+          "level": "intermediate"
+        },
+        "score": 52,
+        "band": "simplify",
+        "decision": "repeat",
+        "feedback": "Thanks, Chinmay. This take was far from the written notes, so I can't give a fair note-by-note review. The recording wandered up the keyboard and missed most of the pickup and bars 1\u20132. Last time you played the beginner version of this chunk perfectly, so you can do it. Start on the pickup with B4, A4, G#4, A4, then C5, and play them slowly and evenly. Then go on to bar 1 (D5, C5, B4, C5, E5) and bar 2 (F5, E5, D#5, E5). Take it a few notes at a time and don't worry about speed. The pickup notes B4, A4 and G#4 have been skipped before, so give them extra attention.",
+        "reason": "First sub-50 score at intermediate for this chunk, so repeat it before stepping back down.",
+        "next_assignment": {
+          "scope": 0,
+          "level": "intermediate"
+        },
+        "recording": "/Users/chinmaymrp/Stanford/Coursework/CS329Z_Project/Music-Tutor-329z/runs/tutor_recordings/Chinmay/20261106-000402.wav"
+      },
+      {
+        "assignment": {
+          "scope": 0,
+          "level": "intermediate"
+        },
+        "score": 100,
+        "band": "polish",
+        "decision": "harder",
+        "feedback": "Chinmay, that was clean. Every note of the pickup and bars 1\u20132 was right and in order, from B4 A4 G#4 A4 C5 D5 through to F5 E5 D#5 E5. The pickup notes you used to skip were all there this time. You played well under tempo, which is fine while learning. Next, try the same two bars at full speed, 90 bpm. Keep the four-note pickup even and don't rush the E5 at the end of bar 1.",
+        "reason": "Perfect score on the intermediate version of this chunk, so the next step is the same chunk at full tempo.",
+        "next_assignment": {
+          "scope": 0,
+          "level": "full"
+        },
+        "recording": "/Users/chinmaymrp/Stanford/Coursework/CS329Z_Project/Music-Tutor-329z/runs/tutor_recordings/Chinmay/20261106-000501.wav"
+      },
+      {
+        "assignment": {
+          "scope": 0,
+          "level": "full"
+        },
+        "score": 100,
+        "band": "polish",
+        "decision": "next_chunk",
+        "feedback": "Chinmay, all 14 notes were right: the pickup B4 A4 G#4 A4 C5, then bar 1 D5 C5 B4 C5, then bar 2 E5 F5 E5 D#5 E5. The pickup notes that tripped you up before were clean this time. You played slower than 90 bpm, which is fine at this stage. Next we move on to bars 3-4 at beginner level, and we'll bring the speed up once the whole piece is under your fingers.",
+        "reason": "Chunk 0 passed at full level with a score of 100 (the flagged candidates were alignment and octave artifacts), so we move on to the next chunk at beginner level.",
+        "next_assignment": {
+          "scope": 1,
+          "level": "beginner"
+        },
+        "recording": "/Users/chinmaymrp/Stanford/Coursework/CS329Z_Project/Music-Tutor-329z/runs/tutor_recordings/Chinmay/20261106-000602.wav"
+      },
+      {
+        "assignment": {
+          "scope": 1,
+          "level": "beginner"
+        },
+        "score": 100,
+        "band": "polish",
+        "decision": "harder",
+        "feedback": "Nice work, Chinmay. Bars 3-4 had all the right notes: B5, G#5, B5, G#5, then C6, A5, C6. The small timing wobbles are normal at this stage. Next, play the same bars with all the notes at the slow tempo. Keep the beat steady through the quick turns.",
+        "reason": "Perfect score on this chunk at beginner level, so move up to intermediate level on the same bars.",
+        "next_assignment": {
+          "scope": 2,
+          "level": "intermediate"
+        },
+        "recording": "/Users/chinmaymrp/Stanford/Coursework/CS329Z_Project/Music-Tutor-329z/runs/tutor_recordings/Chinmay/20261106-000657.wav"
+      },
+      {
+        "assignment": {
+          "scope": 2,
+          "level": "intermediate"
+        },
+        "score": 100,
+        "band": "polish",
+        "decision": "harder",
+        "feedback": "Nice work, Chinmay! In bars 5-6 every note was right: B5 A5 G5 A5, then the quick G5-A5 turn, in both bars. The rhythm was steady and clean, so I'm not counting any of the small timing wobbles. Next, play the same two bars at full tempo, 90 bpm. Keep the quick G5-A5 turn at the end of each bar crisp.",
+        "reason": "Scored 100 at intermediate on this chunk, so the next step is the same chunk at full tempo.",
+        "next_assignment": {
+          "scope": 2,
+          "level": "full"
+        },
+        "recording": "/Users/chinmaymrp/Stanford/Coursework/CS329Z_Project/Music-Tutor-329z/runs/tutor_recordings/Chinmay/20261106-000822.wav"
+      },
+      {
+        "assignment": {
+          "scope": 2,
+          "level": "full"
+        },
+        "score": 100,
+        "band": "polish",
+        "decision": "next_chunk",
+        "feedback": "Lovely work, Chinmay! Bars 5-6 are clean at full tempo. Every note was right, from the B5-A5-G5 run through the A5 and G5 in bar 6. The tiny quick notes before the beat were too fast for me to hear clearly, so I counted them as fine. Now let's move on to the last two bars, starting simple.",
+        "reason": "Passed this chunk at full tempo with a score of 100, so the next step is the following chunk at beginner level.",
+        "next_assignment": {
+          "scope": 3,
+          "level": "beginner"
+        },
+        "recording": "/Users/chinmaymrp/Stanford/Coursework/CS329Z_Project/Music-Tutor-329z/runs/tutor_recordings/Chinmay/20261106-000853.wav"
+      },
+      {
+        "assignment": {
+          "scope": 3,
+          "level": "beginner"
+        },
+        "score": 68,
+        "band": "simplify",
+        "decision": "repeat",
+        "feedback": "Nice, steady rhythm, Chinmay. In bar 7, beat 1, the B5 was missing, so you started on A5. The run should go B5, A5, G5, F#5. In bar 8, beat 2, you ended on F5 where the E5 should be. Try again slowly and start on the high B5. Then count the notes: four in bar 7, then E5, E5, F5 in bar 8.",
+        "reason": "Score 68 in the chunk lesson is below the pass mark, with a missed opening B5 and a wrong ending note, so repeat the same chunk at beginner level.",
+        "next_assignment": {
+          "scope": 3,
+          "level": "beginner"
+        },
+        "recording": "/Users/chinmaymrp/Stanford/Coursework/CS329Z_Project/Music-Tutor-329z/runs/tutor_recordings/Chinmay/20261106-000947.wav"
+      },
+      {
+        "assignment": {
+          "scope": 3,
+          "level": "beginner"
+        },
+        "score": 85,
+        "band": "polish",
+        "decision": "harder",
+        "feedback": "Nice work, Chinmay. Bars 7-8 are much better than last time, and the rest of the line was right: A5, G5, F#5, E5, E5, F5. The one slip was bar 7, beat 1. The opening B5 didn't sound, so start on B5 and let it ring before you step down to A5. Next you'll play the same two bars with all the notes, still slowly.",
+        "reason": "The score of 85 passes the beginner chunk, so the next step is the same chunk at intermediate level, with the missed opening B5 as the thing to fix.",
+        "next_assignment": {
+          "scope": 3,
+          "level": "intermediate"
+        },
+        "recording": "/Users/chinmaymrp/Stanford/Coursework/CS329Z_Project/Music-Tutor-329z/runs/tutor_recordings/Chinmay/20261106-001043.wav"
+      },
+      {
+        "assignment": {
+          "scope": 3,
+          "level": "intermediate"
+        },
+        "score": 100,
+        "band": "polish",
+        "decision": "harder",
+        "feedback": "Lovely, Chinmay! Bars 7-8 were all correct: B5, A5, G5, F#5, E5, E5, F5, with steady rhythm. The B5 on beat 1 of bar 7 used to get skipped, and this time you played it. Next, try the same two bars at full tempo (90 bpm). Keep the same even descending line.",
+        "reason": "Perfect score at intermediate level, so move this chunk up to full tempo.",
+        "next_assignment": {
+          "scope": 3,
+          "level": "full"
+        },
+        "recording": "/Users/chinmaymrp/Stanford/Coursework/CS329Z_Project/Music-Tutor-329z/runs/tutor_recordings/Chinmay/20261106-001207.wav"
+      },
+      {
+        "assignment": {
+          "scope": 3,
+          "level": "full"
+        },
+        "score": 80,
+        "band": "simplify",
+        "decision": "repeat",
+        "feedback": "Chinmay, you played every note of bars 7-8 correctly: B5 A5 G5 F#5 E5, then E5 F5. The extra notes in the transcription are artifacts, not your mistakes. You're rushing, though. The B5 to A5 at the start of bar 7 and the first E5 of bar 8 are uneven, and the whole thing came out faster than 90 bpm. Count four steady beats, with each descending note on its own beat. Play it again at full tempo and aim for even spacing.",
+        "reason": "Notes are all correct but rhythm is rushed and uneven (score 80), so repeat the same chunk at full tempo focusing on steadiness.",
+        "next_assignment": {
+          "scope": 3,
+          "level": "full"
+        },
+        "recording": "/Users/chinmaymrp/Stanford/Coursework/CS329Z_Project/Music-Tutor-329z/runs/tutor_recordings/Chinmay/20261106-001232.wav"
+      },
+      {
+        "assignment": {
+          "scope": 3,
+          "level": "full"
+        },
+        "score": 80,
+        "band": "simplify",
+        "decision": "repeat",
+        "feedback": "Nice work, Chinmay. All the notes are right, and the B5 you skipped before is there now. The descent B5 A5 G5 F#5 E5 in bar 7 is smooth. The problem is rhythm in bar 8. The first E5 came early, and the second E5 before the F5 came late, so the two notes weren't evenly spaced. Count \"1 2\" evenly in bar 8 and play the two E5s as steady beats, then F5. Try it again at full tempo.",
+        "reason": "All notes were right, but the score was 80 because bar 8 timing was uneven. The extra high notes were transcription octave artifacts. One more try at the same level should fix it.",
+        "next_assignment": {
+          "scope": 3,
+          "level": "full"
+        },
+        "recording": "/Users/chinmaymrp/Stanford/Coursework/CS329Z_Project/Music-Tutor-329z/runs/tutor_recordings/Chinmay/20261106-001330.wav"
+      },
+      {
+        "assignment": {
+          "scope": 3,
+          "level": "full"
+        },
+        "score": 78,
+        "band": "simplify",
+        "decision": "repeat",
+        "feedback": "Nice, Chinmay. The rest of bars 7-8 was right: G5, F#5, E5, E5, F5, and the rhythm was steady. The one problem is the same one as before. In bar 7, beat 1, you skipped the opening B5 and started on A5, and the A5 sounded twice. Before you play, say \"B \u2013 A \u2013 G \u2013 F# \u2013 E\" and put your finger on B5. Then play the bar again at 90 bpm, starting on that B5.",
+        "reason": "Score 78 with one real mistake, the recurring skipped B5 at the start of bar 7, so repeat the same chunk at full level.",
+        "next_assignment": {
+          "scope": 3,
+          "level": "full"
+        },
+        "recording": "/Users/chinmaymrp/Stanford/Coursework/CS329Z_Project/Music-Tutor-329z/runs/tutor_recordings/Chinmay/20261106-001433.wav"
+      },
+      {
+        "assignment": {
+          "scope": 3,
+          "level": "full"
+        },
+        "score": 100,
+        "band": "polish",
+        "decision": "next_chunk",
+        "feedback": "Lovely, Chinmay! Bars 7-8 were clean at full tempo. The B5 down to E5 run was even, and the E5 and F5 at the end were right. The bar 7 B5 you used to skip came in this time. Now put all the bars together and play the whole excerpt at full tempo. Watch the pickup notes, because those have slipped before.",
+        "reason": "They passed the last chunk at full tempo (100), so the next step is the whole excerpt at full level.",
+        "next_assignment": {
+          "scope": "whole",
+          "level": "full"
+        },
+        "recording": "/Users/chinmaymrp/Stanford/Coursework/CS329Z_Project/Music-Tutor-329z/runs/tutor_recordings/Chinmay/20261106-001511.wav"
+      },
+      {
+        "assignment": {
+          "scope": "whole",
+          "level": "full"
+        },
+        "score": 35,
+        "band": "chunk",
+        "decision": "beginner_lesson",
+        "feedback": "Chinmay, thanks for playing the whole piece. Full tempo is a big jump right now, because you played at roughly 40% of the speed. Many of the notes you did play were right, like the pickup and the A5\u2013G5\u2013A5\u2013B5 figures in bars 5\u20138. At that pace the quick runs fell apart: bar 2 beat 2 (F5, E5, D#5, E5) and bar 3 (B5, A5, G#5, A5). The pickup notes B4, A4 and G#4 also keep slipping, as they have before. Let's rebuild from the start with bars 1\u20132 in the simplified version at a slow 60 bpm, then add the notes back.",
+        "reason": "The whole-excerpt full-tempo score was 3, in the chunk band, so I'm restarting at the first 2-bar chunk with the beginner version.",
+        "next_assignment": {
+          "scope": 0,
+          "level": "beginner"
+        },
+        "recording": "/Users/chinmaymrp/Stanford/Coursework/CS329Z_Project/Music-Tutor-329z/runs/tutor_recordings/Chinmay/20261106-001736.wav"
+      }
+    ]
+  }
+}

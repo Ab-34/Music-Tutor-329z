@@ -1,0 +1,312 @@
+[
+  {
+    "piece": "Rondo alla Turca",
+    "time": 0.0,
+    "pitch": 71,
+    "type": "missed",
+    "count": 3,
+    "first_seen": "2026-11-06T00:02:14",
+    "last_seen": "2026-11-06T00:17:48",
+    "note": "Pickup: skipped the B4"
+  },
+  {
+    "piece": "Rondo alla Turca",
+    "time": 0.167,
+    "pitch": 69,
+    "type": "missed",
+    "count": 5,
+    "first_seen": "2026-11-06T00:02:14",
+    "last_seen": "2026-11-06T00:17:48",
+    "note": "Pickup: skipped the A4"
+  },
+  {
+    "piece": "Rondo alla Turca",
+    "time": 0.333,
+    "pitch": 68,
+    "type": "missed",
+    "count": 3,
+    "first_seen": "2026-11-06T00:02:14",
+    "last_seen": "2026-11-06T00:17:48",
+    "note": "Pickup: skipped the G#4"
+  },
+  {
+    "piece": "Rondo alla Turca",
+    "time": 2.0,
+    "pitch": 76,
+    "type": "wrong_pitch",
+    "count": 1,
+    "first_seen": "2026-11-06T00:02:14",
+    "last_seen": "2026-11-06T00:02:14",
+    "note": "Bar 2, beat 1: played A#4 instead of E5"
+  },
+  {
+    "piece": "Rondo alla Turca",
+    "time": 3.333,
+    "pitch": 83,
+    "type": "missed",
+    "count": 1,
+    "first_seen": "2026-11-06T00:02:14",
+    "last_seen": "2026-11-06T00:02:14",
+    "note": "Bar 3, beat 1: skipped the B5"
+  },
+  {
+    "piece": "Rondo alla Turca",
+    "time": 3.5,
+    "pitch": 81,
+    "type": "missed",
+    "count": 2,
+    "first_seen": "2026-11-06T00:02:14",
+    "last_seen": "2026-11-06T00:17:48",
+    "note": "Bar 3, beat 1: skipped the A5"
+  },
+  {
+    "piece": "Rondo alla Turca",
+    "time": 4.667,
+    "pitch": 84,
+    "type": "missed",
+    "count": 1,
+    "first_seen": "2026-11-06T00:02:14",
+    "last_seen": "2026-11-06T00:02:14",
+    "note": "Bar 4, beat 1: skipped the C6"
+  },
+  {
+    "piece": "Rondo alla Turca",
+    "time": 1.333,
+    "pitch": 74,
+    "type": "missed",
+    "count": 1,
+    "first_seen": "2026-11-06T00:04:12",
+    "last_seen": "2026-11-06T00:04:12",
+    "note": "Bar 1, beat 2: skipped the D5"
+  },
+  {
+    "piece": "Rondo alla Turca",
+    "time": 1.5,
+    "pitch": 72,
+    "type": "missed",
+    "count": 2,
+    "first_seen": "2026-11-06T00:04:12",
+    "last_seen": "2026-11-06T00:04:12",
+    "note": "Bar 1, beat 2: skipped the C5"
+  },
+  {
+    "piece": "Rondo alla Turca",
+    "time": 1.667,
+    "pitch": 71,
+    "type": "missed",
+    "count": 1,
+    "first_seen": "2026-11-06T00:04:12",
+    "last_seen": "2026-11-06T00:04:12",
+    "note": "Bar 1, beat 2: skipped the B4"
+  },
+  {
+    "piece": "Rondo alla Turca",
+    "time": 2.0,
+    "pitch": 76,
+    "type": "missed",
+    "count": 2,
+    "first_seen": "2026-11-06T00:04:12",
+    "last_seen": "2026-11-06T00:17:48",
+    "note": "Bar 2, beat 1: skipped the E5"
+  },
+  {
+    "piece": "Rondo alla Turca",
+    "time": 2.667,
+    "pitch": 77,
+    "type": "wrong_pitch",
+    "count": 1,
+    "first_seen": "2026-11-06T00:04:12",
+    "last_seen": "2026-11-06T00:04:12",
+    "note": "Bar 2, beat 2: played G#4 instead of F5"
+  },
+  {
+    "piece": "Rondo alla Turca",
+    "time": 2.833,
+    "pitch": 76,
+    "type": "missed",
+    "count": 4,
+    "first_seen": "2026-11-06T00:04:12",
+    "last_seen": "2026-11-06T00:17:48",
+    "note": "Bar 2, beat 2: skipped the E5"
+  },
+  {
+    "piece": "Rondo alla Turca",
+    "time": 3.0,
+    "pitch": 75,
+    "type": "missed",
+    "count": 1,
+    "first_seen": "2026-11-06T00:04:12",
+    "last_seen": "2026-11-06T00:04:12",
+    "note": "Bar 2, beat 2: skipped the D#5"
+  },
+  {
+    "piece": "Rondo alla Turca",
+    "time": 3.333,
+    "pitch": 83,
+    "type": "timing",
+    "count": 1,
+    "first_seen": "2026-11-06T00:07:04",
+    "last_seen": "2026-11-06T00:07:04",
+    "note": "Bar 3, beat 1: the B5 came 97 ms late"
+  },
+  {
+    "piece": "Rondo alla Turca",
+    "time": 4.0,
+    "pitch": 83,
+    "type": "timing",
+    "count": 1,
+    "first_seen": "2026-11-06T00:07:04",
+    "last_seen": "2026-11-06T00:07:04",
+    "note": "Bar 3, beat 2: the B5 came 76 ms early"
+  },
+  {
+    "piece": "Rondo alla Turca",
+    "time": 4.333,
+    "pitch": 80,
+    "type": "timing",
+    "count": 1,
+    "first_seen": "2026-11-06T00:07:04",
+    "last_seen": "2026-11-06T00:07:04",
+    "note": "Bar 3, beat 2: the G#5 came 119 ms early"
+  },
+  {
+    "piece": "Rondo alla Turca",
+    "time": 4.667,
+    "pitch": 84,
+    "type": "timing",
+    "count": 1,
+    "first_seen": "2026-11-06T00:07:04",
+    "last_seen": "2026-11-06T00:07:04",
+    "note": "Bar 4, beat 1: the C6 came 62 ms late"
+  },
+  {
+    "piece": "Rondo alla Turca",
+    "time": 8.667,
+    "pitch": 83,
+    "type": "missed",
+    "count": 3,
+    "first_seen": "2026-11-06T00:09:58",
+    "last_seen": "2026-11-06T00:14:44",
+    "note": "Bar 7, beat 1: skipped the B5"
+  },
+  {
+    "piece": "Rondo alla Turca",
+    "time": 10.667,
+    "pitch": 76,
+    "type": "wrong_pitch",
+    "count": 1,
+    "first_seen": "2026-11-06T00:09:58",
+    "last_seen": "2026-11-06T00:09:58",
+    "note": "Bar 8, beat 2: played F5 instead of E5"
+  },
+  {
+    "piece": "Rondo alla Turca",
+    "time": 9.679,
+    "pitch": 90,
+    "type": "extra",
+    "count": 1,
+    "first_seen": "2026-11-06T00:12:14",
+    "last_seen": "2026-11-06T00:12:14",
+    "note": "Bar 7, beat 2: an extra F#6 that isn't in the music"
+  },
+  {
+    "piece": "Rondo alla Turca",
+    "time": 8.667,
+    "pitch": 83,
+    "type": "timing",
+    "count": 1,
+    "first_seen": "2026-11-06T00:12:41",
+    "last_seen": "2026-11-06T00:12:41",
+    "note": "Bar 7, beat 1: the B5 came 97 ms late"
+  },
+  {
+    "piece": "Rondo alla Turca",
+    "time": 9.0,
+    "pitch": 81,
+    "type": "timing",
+    "count": 1,
+    "first_seen": "2026-11-06T00:12:41",
+    "last_seen": "2026-11-06T00:12:41",
+    "note": "Bar 7, beat 1: the A5 came 51 ms early"
+  },
+  {
+    "piece": "Rondo alla Turca",
+    "time": 10.0,
+    "pitch": 76,
+    "type": "timing",
+    "count": 2,
+    "first_seen": "2026-11-06T00:12:41",
+    "last_seen": "2026-11-06T00:13:39",
+    "note": "Bar 8, beat 1: the E5 came 43 ms early"
+  },
+  {
+    "piece": "Rondo alla Turca",
+    "time": 10.667,
+    "pitch": 76,
+    "type": "timing",
+    "count": 1,
+    "first_seen": "2026-11-06T00:13:39",
+    "last_seen": "2026-11-06T00:13:39",
+    "note": "Bar 8, beat 2: the E5 came 47 ms late"
+  },
+  {
+    "piece": "Rondo alla Turca",
+    "time": 8.915,
+    "pitch": 81,
+    "type": "extra",
+    "count": 1,
+    "first_seen": "2026-11-06T00:14:44",
+    "last_seen": "2026-11-06T00:14:44",
+    "note": "Bar 7, beat 1: an extra A5 that isn't in the music"
+  },
+  {
+    "piece": "Rondo alla Turca",
+    "time": 2.667,
+    "pitch": 77,
+    "type": "missed",
+    "count": 1,
+    "first_seen": "2026-11-06T00:17:48",
+    "last_seen": "2026-11-06T00:17:48",
+    "note": "Bar 2, beat 2: skipped the F5"
+  },
+  {
+    "piece": "Rondo alla Turca",
+    "time": 3.0,
+    "pitch": 75,
+    "type": "wrong_pitch",
+    "count": 1,
+    "first_seen": "2026-11-06T00:17:48",
+    "last_seen": "2026-11-06T00:17:48",
+    "note": "Bar 2, beat 2: played D5 instead of D#5"
+  },
+  {
+    "piece": "Rondo alla Turca",
+    "time": 3.333,
+    "pitch": 83,
+    "type": "wrong_pitch",
+    "count": 1,
+    "first_seen": "2026-11-06T00:17:48",
+    "last_seen": "2026-11-06T00:17:48",
+    "note": "Bar 3, beat 1: played C5 instead of B5"
+  },
+  {
+    "piece": "Rondo alla Turca",
+    "time": 3.667,
+    "pitch": 80,
+    "type": "missed",
+    "count": 1,
+    "first_seen": "2026-11-06T00:17:48",
+    "last_seen": "2026-11-06T00:17:48",
+    "note": "Bar 3, beat 1: skipped the G#5"
+  },
+  {
+    "piece": "Rondo alla Turca",
+    "time": 3.833,
+    "pitch": 81,
+    "type": "wrong_pitch",
+    "count": 1,
+    "first_seen": "2026-11-06T00:17:48",
+    "last_seen": "2026-11-06T00:17:48",
+    "note": "Bar 3, beat 1: played B4 instead of A5"
+  }
+]

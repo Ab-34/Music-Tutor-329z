@@ -100,7 +100,8 @@ st.subheader("Play it and send it to the tutor")
 n = len(history)
 tab_rec, tab_up, tab_sim = st.tabs(["🎙️ Record", "📁 Upload a file", "🤖 No piano? Simulate a take"])
 with tab_rec:
-    rec = st.audio_input("Record yourself playing the assignment", key=f"rec_{learner}_{n}")
+    rec_round = st.session_state.setdefault("rec_round", 0)   # bumped by "Discard and re-record"
+    rec = st.audio_input("Record yourself playing the assignment", key=f"rec_{learner}_{n}_{rec_round}")
 with tab_up:
     up = st.file_uploader("A recording (.wav) or a MIDI file from a digital piano (.mid)",
                           type=["wav", "mid", "midi"], key=f"up_{learner}_{n}")
@@ -144,7 +145,12 @@ elif have_input and is_audio and not C.audio_extras_installed():
 if blocked:
     st.warning(blocked)
 
-if st.button("Send to the tutor", type="primary", disabled=not have_input or bool(blocked), key="send"):
+b_send, b_redo, _ = st.columns([1.3, 1.6, 5])
+if rec is not None and b_redo.button("Discard and re-record", key="rerecord",
+                                     help="Throw this recording away and record again"):
+    st.session_state["rec_round"] += 1   # a new key gives an empty recorder
+    st.rerun()
+if b_send.button("Send to the tutor", type="primary", disabled=not have_input or bool(blocked), key="send"):
     path = save_input()
     try:
         with st.status("The tutor is listening…", expanded=True) as status:

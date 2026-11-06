@@ -104,3 +104,19 @@ def test_turn_without_finish_keeps_the_assignment(tmp_path, monkeypatch):
     res = T.run_tutor_turn("dee", take(tmp_path, "nearly_there", T.FIRST_ASSIGNMENT), PIECE, max_turns=3)
     assert res["error"] and res["next_assignment"] == T.FIRST_ASSIGNMENT
     assert T.current_assignment("dee", PIECE) == T.FIRST_ASSIGNMENT
+
+
+def test_every_turn_saves_a_full_transcript(tmp_path, monkeypatch):
+    monkeypatch.setattr(T, "TRANSCRIPTS", tmp_path / "sessions")
+    chat, _ = scripted([
+        [("transcribe_recording", {})], [("compare_to_assignment", {})],
+        [("finish_turn", {"decision": "polish", "feedback": "Nice.", "next_scope": "whole", "next_level": "full",
+                          "reason": "close"})],
+    ])
+    monkeypatch.setattr(llm, "chat", chat)
+    res = T.run_tutor_turn("eve", take(tmp_path, "nearly_there", T.FIRST_ASSIGNMENT), PIECE)
+    [tr] = T.load_transcripts("eve", tmp_path / "sessions")
+    assert tr["decision"] == "polish" and tr["attempt"] == 1 and res["transcript"]
+    roles = [m["role"] for m in tr["messages"]]
+    assert roles[:2] == ["system", "user"] and roles.count("tool") == 3       # every tool result is kept
+    assert tr["transcription"] and tr["trace"][-1]["tool"] == "finish_turn"

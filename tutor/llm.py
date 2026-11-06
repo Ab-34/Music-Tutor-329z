@@ -91,12 +91,9 @@ def _record(row: dict) -> None:
 
 # ---- the call -------------------------------------------------------------
 
-def chat(messages: list[dict], *, tools: list[dict] | None = None, response_format: dict | None = None,
-         model: str | None = None, max_tokens: int = 16000, tag: str = "", cache: bool | None = None) -> dict:
-    """One chat completion. Returns the response as a plain dict, plus
-    ``resp["cost_usd"]`` (0 for a cache hit) and ``resp["cached"]``."""
-    model = model or MODEL
-    req = {"model": model, "messages": messages, "max_tokens": max_tokens,
+def build_request(messages: list[dict], *, tools=None, response_format=None, model: str | None = None,
+                  max_tokens: int = 16000) -> dict:
+    req = {"model": model or MODEL, "messages": messages, "max_tokens": max_tokens,
            "extra_body": {"usage": {"include": True}}}
     if EFFORT:
         req["extra_body"]["reasoning"] = {"effort": EFFORT}
@@ -104,10 +101,22 @@ def chat(messages: list[dict], *, tools: list[dict] | None = None, response_form
         req["tools"] = tools
     if response_format:
         req["response_format"] = response_format
+    return req
 
-    use_cache = os.environ.get("TUTOR_CACHE", "1") != "0" if cache is None else cache
+
+def cache_path(req: dict) -> Path:
     key = hashlib.sha256(json.dumps(req, sort_keys=True, default=str).encode()).hexdigest()
-    path = CACHE_DIR / key[:2] / f"{key}.json"
+    return CACHE_DIR / key[:2] / f"{key}.json"
+
+
+def chat(messages: list[dict], *, tools: list[dict] | None = None, response_format: dict | None = None,
+         model: str | None = None, max_tokens: int = 16000, tag: str = "", cache: bool | None = None) -> dict:
+    """One chat completion. Returns the response as a plain dict, plus
+    ``resp["cost_usd"]`` (0 for a cache hit) and ``resp["cached"]``."""
+    model = model or MODEL
+    req = build_request(messages, tools=tools, response_format=response_format, model=model, max_tokens=max_tokens)
+    use_cache = os.environ.get("TUTOR_CACHE", "1") != "0" if cache is None else cache
+    path = cache_path(req)
     if use_cache and path.exists():
         resp = json.loads(path.read_text())
         resp.update(cost_usd=0.0, cached=True)

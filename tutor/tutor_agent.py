@@ -35,6 +35,23 @@ LEVEL_TEXT = {
 DECISIONS = ["polish", "easier_version", "beginner_lesson", "repeat", "easier", "harder", "next_chunk",
              "piece_learned"]
 FIRST_ASSIGNMENT = {"scope": "whole", "level": "full"}
+TRANSCRIPTS = Path(__file__).resolve().parent.parent / "runs" / "tutor_sessions"
+
+
+def save_transcript(learner: str, turn: dict, root: Path | None = None) -> Path:
+    """One JSON file per turn: runs/tutor_sessions/<learner>/<timestamp>.json (see load_transcripts)."""
+    import time
+    folder = (root or TRANSCRIPTS) / "".join(c for c in learner if c.isalnum() or c in "-_")
+    folder.mkdir(parents=True, exist_ok=True)
+    path = folder / f"{turn.get('started', time.strftime('%Y%m%d-%H%M%S'))}.json"
+    conv = lambda x: x.item() if hasattr(x, "item") else (x.__dict__ if hasattr(x, "__dict__") else str(x))
+    path.write_text(json.dumps(turn, indent=1, default=conv))
+    return path
+
+
+def load_transcripts(learner: str, root: Path | None = None) -> list[dict]:
+    folder = (root or TRANSCRIPTS) / "".join(c for c in learner if c.isalnum() or c in "-_")
+    return [json.loads(p.read_text()) for p in sorted(folder.glob("*.json"))]
 
 
 def scope_chunk(piece: Piece, scope) -> Chunk:
@@ -237,6 +254,8 @@ def current_assignment(learner: str, piece: Piece | None = None) -> dict:
 
 def run_tutor_turn(learner: str, recording: str, piece: Piece | None = None, on_event=None,
                    max_turns: int = 16, save: bool = True) -> dict:
+    import time
+    started = time.strftime("%Y%m%d-%H%M%S")
     piece = piece or rondo_piece()
     progress = memory.read_progress(learner, piece.name)
     assignment = progress.get("assignment") or dict(FIRST_ASSIGNMENT)
@@ -253,6 +272,11 @@ def run_tutor_turn(learner: str, recording: str, piece: Piece | None = None, on_
            "trace": s.trace, "usage": usage, "perf": s.perf, "target": s.tgt.notes if s.perf is not None else None}
     if s.result is None:
         out.update(error=stop or "the tutor did not finish its turn", decision=None, next_assignment=assignment)
+        if save:
+            out["transcript"] = str(save_transcript(learner, {
+                "learner": learner, "piece": piece.name, "started": started, "recording": str(recording),
+                "assignment": assignment, "error": out["error"], "usage": usage, "messages": messages,
+                "trace": s.trace}))
         return out
     out.update(s.result, rubric=s.rubric.to_dict() if s.rubric else None,
                next_assignment_text=describe_assignment(piece, s.result["next_assignment"]))
@@ -269,4 +293,13 @@ def run_tutor_turn(learner: str, recording: str, piece: Piece | None = None, on_
             "next_assignment": s.result["next_assignment"], "recording": str(recording)})
         progress["assignment"] = s.result["next_assignment"]
         memory.write_progress(learner, piece.name, progress)
+    if save:
+        out["transcript"] = str(save_transcript(learner, {
+            "learner": learner, "piece": piece.name, "started": started, "recording": str(recording),
+            "attempt": len(progress.get("history", [])), "assignment": assignment,
+            "decision": out.get("decision"), "rubric": out.get("rubric"), "feedback": out.get("feedback"),
+            "reason": out.get("reason"), "next_assignment": out.get("next_assignment"),
+            "mistakes": out.get("mistakes"), "error": out.get("error"), "usage": usage,
+            "transcription": [[n.pitch, round(n.onset, 3), round(n.offset, 3)] for n in (s.perf or [])],
+            "messages": messages, "trace": s.trace}))
     return out
