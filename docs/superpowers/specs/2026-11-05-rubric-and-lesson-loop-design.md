@@ -37,13 +37,16 @@ simulated learners: does an LLM coach get a learner to the full piece in fewer a
 ## Rubric (`tutor/rubric.py`)
 `score(target: list[Note], errors: list[dict], perf: list[Note] | None = None, bar_beat=None) -> Rubric`
 
-| Part | Formula (n = notes in target) | Weight |
+| Part | Formula (n = notes in target, allowed = max(0.05·n, 2)) | Weight |
 |---|---|---|
-| Right notes | 1 − wrong_pitch / n | 0.35 |
-| Complete | 1 − missed / n | 0.30 |
-| Rhythm | 1 − timing / n | 0.20 |
-| Clean | 1 − min(extra, n) / n | 0.15 |
+| Right notes | 1 − wrong_pitch / allowed | 0.35 |
+| Complete | 1 − missed / allowed | 0.30 |
+| Rhythm | 1 − timing / allowed | 0.20 |
+| Clean | 1 − extra / allowed | 0.15 |
 
+- **Calibration (changed during implementation):** the first draft used `1 − count / n`. That scored the struggling
+  Rondo takes (13 mistakes in 8 bars) at 96, in the polish band. With `allowed = max(5% of notes, 2)` the bundled
+  takes land in their intended bands: nearly there 93 (polish), intermediate 68–72 (simplify), struggling 34–42 (chunk).
 - Each part is clamped to [0, 1] and reported ×100. `total` is the weighted sum, rounded to an integer.
 - `tempo_ratio` (performance duration ÷ target duration, only when `perf` is given) is reported but not scored.
 - `worst_bars`: the bars with the most errors, for example `[{"bar": 3, "errors": 2, "types": {"wrong_pitch": 2}}]`,

@@ -17,7 +17,7 @@ st.markdown(
     "Start with **Assess** on the bundled example: it has 3 known mistakes, so you can check the result right away."
 )
 
-cols = st.columns(5)
+cols = st.columns(6)
 pages = [
     ("pages/1_Assess.py", "🔎 Assess", "Run the agent or a baseline on a performance. Live tool trace, piano roll, "
                                      "score against known mistakes, feedback, audio."),
@@ -25,6 +25,8 @@ pages = [
     ("pages/3_Memory.py", "🧠 Memory", "The mistake log the agent keeps for each learner."),
     ("pages/4_Eval.py", "📊 Eval", "Launch and watch eval runs over the perturbation set, then compare systems."),
     ("pages/5_Spending.py", "💸 Spending", "Every paid LLM call, by tag and model, against the budget."),
+    ("pages/6_Lesson.py", "🧑‍🏫 Lesson", "A practice loop for learners who are far off: chunks, simplified first, "
+                                         "repeat or move on after each attempt."),
 ]
 for col, (path, label, desc) in zip(cols, pages):
     with col:

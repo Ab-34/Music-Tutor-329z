@@ -87,7 +87,8 @@ def test_estimate_cost_averages_past_cases(tmp_path):
 # ---- page smoke tests -------------------------------------------------------
 
 @pytest.mark.parametrize("page", ["gui/app.py", "gui/pages/1_Assess.py", "gui/pages/2_Simplify.py",
-                                  "gui/pages/3_Memory.py", "gui/pages/4_Eval.py", "gui/pages/5_Spending.py"])
+                                  "gui/pages/3_Memory.py", "gui/pages/4_Eval.py", "gui/pages/5_Spending.py",
+                                  "gui/pages/6_Lesson.py"])
 def test_page_loads(page):
     at = AppTest.from_file(str(sources.ROOT / page), default_timeout=30).run()
     assert not at.exception, at.exception
@@ -122,3 +123,25 @@ def test_rondo_takes_listed_for_every_level():
     takes = sources.rondo_takes()
     assert {t.level for t in takes} == {"perfect", "nearly_there", "intermediate", "struggling"}
     assert "Rondo alla Turca learners" in sources.eval_sets()
+
+
+def test_lesson_page_steps_through_a_rules_lesson():
+    at = AppTest.from_file(str(sources.ROOT / "gui/pages/6_Lesson.py"), default_timeout=60).run()
+    assert not at.exception, at.exception
+    at.button(key="lesson_new").click().run()
+    for _ in range(3):
+        at.button(key="lesson_step").click().run()
+    assert not at.exception, at.exception
+    assert len(at.session_state["lesson"].rows) == 3
+    at.button(key="lesson_run").click().run()
+    assert not at.exception, at.exception
+    assert at.session_state["lesson"].done
+
+
+def test_assess_rubric_card_offers_a_lesson_for_a_struggling_take():
+    at = AppTest.from_file(str(sources.ROOT / "gui/pages/1_Assess.py"), default_timeout=30).run()
+    at.selectbox(key="rondo_level").select("struggling").run()
+    at.selectbox(key="system").select("algorithmic").run()
+    at.button(key="run").click().run()
+    assert not at.exception, at.exception
+    assert any(b.key == "start_lesson" for b in at.button)

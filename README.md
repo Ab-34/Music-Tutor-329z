@@ -90,6 +90,29 @@ Each level has fixed *weak spots* that repeat in every take, so the agent's memo
 are the GUI's default input, and you can listen before revealing what's wrong. They also form an eval set
 (`examples/rondo/manifest.jsonl`). To regenerate them: `python -m examples.rondo_demo`.
 
+## Rubric and practice lessons
+
+Every assessment gets a **rubric score** (`tutor/rubric.py`): four parts (right notes 35%, complete 30%, rhythm 20%,
+clean 15%), each dropping to 0 once 5% of the notes (at least 2) have that kind of mistake. The score's band decides
+what the tutor does:
+
+| Score | Band | Tutor action |
+|---|---|---|
+| ≥ 85 | polish | Precise note-by-note feedback |
+| 50–84 | simplify | A simplified version of the same passage to learn first |
+| < 50 | chunk | A **practice lesson**: 2-bar chunks, starting simplified |
+
+In a lesson (`tutor/lesson.py`), each chunk climbs three levels: simplified, all notes slowly, all notes at full
+tempo. After each attempt a policy chooses to repeat, go easier, go harder or move on. The `rules` policy is the
+baseline; the `llm` coach makes one LLM call per attempt and may override the rules if it explains why. Attempts come
+from simulated learners who improve with practice (`examples/rondo_learner.py`). Try it on the GUI's **Lesson** page,
+or compare the policies:
+
+```bash
+python -m eval.run_lessons --policy rules --seeds 5               # free
+python -m eval.run_lessons --policy llm --levels struggling --seeds 1   # roughly $0.10 per lesson
+```
+
 ## Audio path (transcription, synthesis, self-check)
 
 ```bash

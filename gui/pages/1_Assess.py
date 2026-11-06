@@ -55,7 +55,7 @@ def pick_rondo() -> dict:
         for e in s.gt:
             st.markdown(f"- {e['description']}")
     return {"label": f"Rondo alla Turca · {s.label}", "ref": s.ref, "perf": s.perf_midi, "gt": s.gt,
-            "case_id": s.case_id, "learner": s.learner, "piece": "rondo"}
+            "case_id": s.case_id, "learner": s.learner, "piece": "rondo", "level": s.level}
 
 
 def pick_source() -> dict | None:
@@ -134,6 +134,55 @@ def run(system: str, src: dict, opts: dict) -> dict:
 
 # ---- results ----------------------------------------------------------------
 
+@st.cache_data(show_spinner=False)
+def simplified_wav(ref_path: str, mtime: float, rondo: bool) -> bytes:
+    if rondo:
+        from examples.rondo_practice import simplified_melody
+        return C.wav_bytes(simplified_melody())
+    from tutor.tools.simplify import melody_only, slow_down
+    return C.wav_bytes(slow_down(melody_only(load_midi(ref_path)), 1.5))
+
+
+def rubric_card(src: dict, ref, perf, errors: list[dict]) -> None:
+    from tutor import rubric
+    from tutor.lesson import describe_error
+
+    rondo = src.get("piece") == "rondo"
+    if rondo:
+        from examples.rondo_demo import bar_beat, where
+    else:
+        bar_beat, where = None, (lambda t: f"{t:.2f} s")
+    r = rubric.score(ref, errors, perf, bar_beat)
+    with st.container(border=True):
+        cols = st.columns([1.3, 1, 1, 1, 1])
+        cols[0].metric("Rubric score", f"{r.total}/100", help="Each part drops to 0 once 5% of the notes "
+                       "(at least 2) have that kind of mistake. Weights: right notes 35%, complete 30%, rhythm 20%, "
+                       "clean 15%.")
+        for col, (k, v) in zip(cols[1:], r.parts.items()):
+            col.metric(rubric.PART_LABELS[k], v)
+        msg = f"**{r.band.capitalize()}:** {rubric.BAND_ACTIONS[r.band]}."
+        if r.band == "polish":
+            st.success(msg)
+            for e in errors[:6]:
+                st.markdown(f"- {describe_error(e, where)}")
+            if not errors:
+                st.markdown("Nothing to fix. Play it again at full tempo.")
+        elif r.band == "simplify":
+            st.warning(msg + " Learn this simplified version first: the quick runs are thinned to their main notes, "
+                       "the grace notes are gone, and it's slower.")
+            st.audio(simplified_wav(src["ref"], _mtime(src["ref"]), rondo), format="audio/wav")
+            if rondo:
+                st.caption("To read the notes, open the practice sheet: `examples/rondo/practice.html`.")
+        else:
+            st.error(msg + " The tutor will split it into 2-bar chunks, start you on a simplified first chunk, "
+                     "and decide after each attempt whether to repeat it, make it easier or harder, or move on.")
+            if st.button("Start a lesson", type="primary", key="start_lesson"):
+                st.session_state["lesson_level"] = src.get("level") or "struggling"
+                st.switch_page("pages/6_Lesson.py")
+        if r.worst_bars:
+            st.caption("Most mistakes in: " + ", ".join(f"bar {w['bar']} ({w['errors']})" for w in r.worst_bars))
+
+
 def show_result(res: dict) -> None:
     out, src = res["out"], res["src"]
     errors = out.get("errors", [])
@@ -155,6 +204,7 @@ def show_result(res: dict) -> None:
         m[3].metric("Recall", f"{sc['metrics']['recall']:.2f}")
         m[4].metric("F1", f"{sc['metrics']['f1']:.2f}")
     m[5].metric("Cost", f"${usage.get('cost_usd', 0):.3f}" if usage else "$0")
+    rubric_card(src, ref, perf, errors)
 
     st.plotly_chart(C.piano_roll(ref, perf, errors, src.get("gt"), sc["pred_status"], sc["gt_status"],
                                  title=f"{C.SYSTEM_LABELS.get(res['system'], res['system'])} · {src['label']}"),
