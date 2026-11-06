@@ -45,6 +45,28 @@ def bass_roots(notes: list[Note], split: int = 60) -> list[Note]:
     return sorted(melody_only(rh) + lh, key=lambda n: n.onset)
 
 
+def drop_ornaments(notes: list[Note], min_dur: float = 0.08) -> list[Note]:
+    """Remove grace notes and other very short ornaments (shorter than `min_dur` seconds)."""
+    return [n for n in notes if n.offset - n.onset >= min_dur]
+
+
+def thin_to_grid(notes: list[Note], grid: float = 0.5, origin: float = 0.0) -> list[Note]:
+    """For a single-note line: keep only the first note that starts in each `grid`-second cell, so
+    fast runs become their main notes (e.g. four sixteenths -> two eighths with grid = an eighth).
+    A kept note is held for at least one cell, but never past the next kept note."""
+    kept, seen = [], set()
+    for n in sorted(notes, key=lambda n: n.onset):
+        cell = int((n.onset - origin) / grid + 1e-3)  # tolerate onsets rounded a hair early
+        if cell not in seen:
+            seen.add(cell)
+            kept.append(Note(n.pitch, n.onset, n.offset, n.velocity))
+    for a, b in zip(kept, kept[1:]):
+        a.offset = min(max(a.offset, a.onset + grid), b.onset)
+    if kept:
+        kept[-1].offset = max(kept[-1].offset, kept[-1].onset + grid)
+    return kept
+
+
 def quantize(notes: list[Note], grid: float = 0.25) -> list[Note]:
     out = []
     for n in notes:
@@ -62,6 +84,8 @@ STEPS = {
     "drop_inner_voices": drop_inner_voices,
     "bass_roots": bass_roots,
     "melody_only": melody_only,
+    "drop_ornaments": drop_ornaments,
+    "thin_to_grid": thin_to_grid,
     "quantize": quantize,
     "slow_down": slow_down,
 }

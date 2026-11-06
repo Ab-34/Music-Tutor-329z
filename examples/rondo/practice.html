@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rondo alla Turca practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#F6F7F9;--ink:#17212B;--muted:#5A6472;--ivory:#FFFFFF;--line:#C7CDD6;--ebony:#1F242C;
+--accent:#0E7C86;--accent-ink:#FFFFFF;--unit:40px}
+@media (prefers-color-scheme:dark){:root{--paper:#14181D;--ink:#E8ECF1;--muted:#9AA4B1;--line:#59616C}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.55 "Atkinson Hyperlegible",system-ui,sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px 64px}
+header{padding:28px 0 8px}
+h1{font-size:2.1rem;line-height:1.15;margin:0 0 6px;font-weight:700;letter-spacing:-.01em}
+h1+p{margin:0;color:var(--muted);max-width:62ch}
+.keys{position:sticky;top:0;z-index:5;background:var(--paper);padding:12px 0 10px;border-bottom:1px solid var(--line)}
+.kb{position:relative;height:118px;max-width:760px}
+.wk{position:absolute;top:0;height:118px;background:var(--ivory);border:1px solid var(--line);border-radius:0 0 6px 6px;
+display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px;color:#8A93A0;font-size:.8rem}
+.wk.used{color:#17212B;font-weight:700}
+.wk.used>span::after{content:"";display:block;width:6px;height:6px;border-radius:50%;background:#17212B;margin:3px auto 0}
+.bk{position:absolute;top:0;height:72px;background:var(--ebony);border-radius:0 0 4px 4px;z-index:2;
+display:flex;align-items:flex-end;justify-content:center;padding-bottom:5px;color:#fff;font-size:.7rem;font-weight:700}
+.wk.start{box-shadow:inset 0 -5px 0 var(--accent)}
+.wk.on,.bk.on{background:var(--accent);color:var(--accent-ink)}
+.kls{position:relative;height:20px;max-width:760px;font-size:.78rem;color:var(--muted)}
+.kl{position:absolute;top:2px;text-align:center;white-space:nowrap}
+.startl{color:var(--accent);font-weight:700}
+.howto{display:flex;flex-wrap:wrap;gap:6px 22px;margin:18px 0 0;padding:0;list-style:none;color:var(--muted);font-size:.95rem}
+.howto i{display:inline-block;width:18px;height:18px;vertical-align:-3px;margin-right:6px;border:1px solid var(--line);border-radius:3px}
+.howto .i1{background:var(--ivory)}.howto .i2{background:var(--ebony);border-color:var(--ebony)}
+.version{margin-top:44px}
+h2{font-size:1.5rem;margin:0 0 2px}
+.facts{margin:0 0 6px;color:var(--muted);font-size:.95rem}
+.vhead p{max-width:64ch}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 18px}
+.controls button{font:inherit;font-weight:700;padding:9px 18px;border-radius:999px;border:2px solid var(--ink);
+background:transparent;color:var(--ink);cursor:pointer}
+.controls .play[data-rate="1"]{background:var(--ink);color:var(--paper)}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.bars{display:flex;flex-wrap:wrap;gap:22px 28px}
+.bar{display:flex;flex-direction:column;gap:6px}
+.bn{font-size:.85rem;color:var(--muted)}
+.tiles{display:flex;align-items:flex-end;gap:4px;min-height:96px;padding-left:10px;border-left:2px solid var(--line)}
+.slot{display:flex;flex-direction:column;align-items:stretch;width:calc(var(--u) * var(--unit) - 4px)}
+.slot.rest{align-self:center;height:2px;background:repeating-linear-gradient(90deg,var(--line) 0 6px,transparent 6px 10px)}
+.n{font:inherit;height:64px;border-radius:6px;cursor:pointer;display:flex;align-items:baseline;justify-content:center;
+padding-top:16px;gap:1px;border:1.5px solid var(--line);background:var(--ivory);color:#17212B}
+.n b{font-size:1.35rem;line-height:1}
+.n small{font-size:.72rem;opacity:.7}
+.n.ebony{background:var(--ebony);border-color:var(--ebony);color:#fff}
+.n.on,.gn.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.grace{display:flex;gap:2px;margin-bottom:4px}
+.gn{font:inherit;font-size:.72rem;font-weight:700;width:22px;height:22px;padding:0;border-radius:4px;cursor:pointer;
+border:1.5px dashed var(--muted);background:var(--ivory);color:#17212B}
+.changes{margin-top:22px;max-width:64ch}
+.changes h3{font-size:1.05rem;margin:0 0 4px}
+.changes ul{margin:0;padding-left:20px}
+footer{margin-top:56px;color:var(--muted);font-size:.85rem;max-width:72ch}
+@media (max-width:600px){:root{--unit:34px}h1{font-size:1.7rem}.kb,.wk{height:92px}.bk{height:56px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head>
+<body><div class="wrap">
+<header>
+  <h1>Rondo alla Turca, one note at a time</h1>
+  <p>Mozart, Piano Sonata No. 11, last movement: the opening theme, for the right hand only.
+     Press one key at a time, like on a harmonium. Play the full melody first, then the simplified one.</p>
+</header>
+<div class="keys">
+  <div class="kb" aria-hidden="true"><span class="wk" data-m="60" style="left:0.0000%;width:6.6667%"><span>C<small>4</small></span></span><span class="wk" data-m="62" style="left:6.6667%;width:6.6667%"><span>D<small>4</small></span></span><span class="wk" data-m="64" style="left:13.3333%;width:6.6667%"><span>E<small>4</small></span></span><span class="wk" data-m="65" style="left:20.0000%;width:6.6667%"><span>F<small>4</small></span></span><span class="wk" data-m="67" style="left:26.6667%;width:6.6667%"><span>G<small>4</small></span></span><span class="wk used" data-m="69" style="left:33.3333%;width:6.6667%"><span>A<small>4</small></span></span><span class="wk used start" data-m="71" style="left:40.0000%;width:6.6667%"><span>B<small>4</small></span></span><span class="wk used" data-m="72" style="left:46.6667%;width:6.6667%"><span>C<small>5</small></span></span><span class="wk used" data-m="74" style="left:53.3333%;width:6.6667%"><span>D<small>5</small></span></span><span class="wk used" data-m="76" style="left:60.0000%;width:6.6667%"><span>E<small>5</small></span></span><span class="wk used" data-m="77" style="left:66.6667%;width:6.6667%"><span>F<small>5</small></span></span><span class="wk used" data-m="79" style="left:73.3333%;width:6.6667%"><span>G<small>5</small></span></span><span class="wk used" data-m="81" style="left:80.0000%;width:6.6667%"><span>A<small>5</small></span></span><span class="wk used" data-m="83" style="left:86.6667%;width:6.6667%"><span>B<small>5</small></span></span><span class="wk used" data-m="84" style="left:93.3333%;width:6.6667%"><span>C<small>6</small></span></span><span class="bk" data-m="61" style="left:4.6667%;width:4.0000%"></span><span class="bk" data-m="63" style="left:11.3333%;width:4.0000%"></span><span class="bk" data-m="66" style="left:24.6667%;width:4.0000%"></span><span class="bk used" data-m="68" style="left:31.3333%;width:4.0000%"><span>G♯</span></span><span class="bk" data-m="70" style="left:38.0000%;width:4.0000%"></span><span class="bk" data-m="73" style="left:51.3333%;width:4.0000%"></span><span class="bk used" data-m="75" style="left:58.0000%;width:4.0000%"><span>D♯</span></span><span class="bk used" data-m="78" style="left:71.3333%;width:4.0000%"><span>F♯</span></span><span class="bk used" data-m="80" style="left:78.0000%;width:4.0000%"><span>G♯</span></span><span class="bk" data-m="82" style="left:84.6667%;width:4.0000%"></span></div><div class="kls"><span class="kl" style="left:0.0000%;width:6.6667%">middle C</span><span class="kl startl" style="left:40.0000%;width:6.6667%">start here</span></div>
+</div>
+<ul class="howto">
+  <li><i class="i1"></i>White tile: white key</li>
+  <li><i class="i2"></i>Dark tile: black key (the ♯ one just right of the letter)</li>
+  <li>Wider tile: hold it longer. A dashed line is a short silence.</li>
+  <li>Tap any tile to hear that note. The key lights up above.</li>
+</ul>
+
+<section class="version" id="full" data-notes='[[71, 0.0, 0.1667], [69, 0.1667, 0.1666], [68, 0.3333, 0.1667], [69, 0.5, 0.1667], [72, 0.6667, 0.3333], [74, 1.3333, 0.1667], [72, 1.5, 0.1667], [71, 1.6667, 0.1666], [72, 1.8333, 0.1667], [76, 2.0, 0.3333], [77, 2.6667, 0.1666], [76, 2.8333, 0.1667], [75, 3.0, 0.1667], [76, 3.1667, 0.1666], [83, 3.3333, 0.1667], [81, 3.5, 0.1667], [80, 3.6667, 0.1666], [81, 3.8333, 0.1667], [83, 4.0, 0.1667], [81, 4.1667, 0.1666], [80, 4.3333, 0.1667], [81, 4.5, 0.1667], [84, 4.6667, 0.6666], [81, 5.3333, 0.3334], [84, 5.6667, 0.2951], [79, 5.9618, 0.0174], [81, 5.9809, 0.0174], [83, 6.0, 0.3333], [81, 6.3333, 0.3334], [79, 6.6667, 0.3333], [81, 7.0, 0.2951], [79, 7.2951, 0.0174], [81, 7.3142, 0.0174], [83, 7.3333, 0.3334], [81, 7.6667, 0.3333], [79, 8.0, 0.3333], [81, 8.3333, 0.2952], [79, 8.6285, 0.0173], [81, 8.6476, 0.0173], [83, 8.6667, 0.3333], [81, 9.0, 0.3333], [79, 9.3333, 0.3334], [78, 9.6667, 0.3333], [76, 10.0, 0.6667], [76, 10.6667, 0.3333], [77, 11.0, 0.3333]]'>
+  <div class="vhead">
+    <h2>The full melody</h2>
+    <p class="facts">46 notes, 90 beats a minute, about 4.06 notes a second</p>
+    <p>Every note of the right hand, as Mozart wrote it. The quick runs come four to a beat.</p>
+    <div class="controls">
+      <button type="button" class="play" data-rate="1">Play</button>
+      <button type="button" class="play" data-rate="0.5">Play at half speed</button>
+      <button type="button" class="stop" hidden>Stop</button>
+    </div>
+  </div>
+  <div class="bars"><div class="bar"><span class="bn">Pickup</span><div class="tiles"><span class="slot" style="--u:1"><button type="button" class="n ivory" data-i="0" data-m="71" aria-label="B4, hold a quarter beat"><b>B</b><small>4</small></button></span><span class="slot" style="--u:1"><button type="button" class="n ivory" data-i="1" data-m="69" aria-label="A4, hold a quarter beat"><b>A</b><small>4</small></button></span><span class="slot" style="--u:1"><button type="button" class="n ebony" data-i="2" data-m="68" aria-label="G♯4, hold a quarter beat"><b>G♯</b><small>4</small></button></span><span class="slot" style="--u:1"><button type="button" class="n ivory" data-i="3" data-m="69" aria-label="A4, hold a quarter beat"><b>A</b><small>4</small></button></span></div></div><div class="bar"><span class="bn">Bar 1</span><div class="tiles"><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="4" data-m="72" aria-label="C5, hold half a beat"><b>C</b><small>5</small></button></span><span class="slot rest" style="--u:2" aria-label="rest"></span><span class="slot" style="--u:1"><button type="button" class="n ivory" data-i="5" data-m="74" aria-label="D5, hold a quarter beat"><b>D</b><small>5</small></button></span><span class="slot" style="--u:1"><button type="button" class="n ivory" data-i="6" data-m="72" aria-label="C5, hold a quarter beat"><b>C</b><small>5</small></button></span><span class="slot" style="--u:1"><button type="button" class="n ivory" data-i="7" data-m="71" aria-label="B4, hold a quarter beat"><b>B</b><small>4</small></button></span><span class="slot" style="--u:1"><button type="button" class="n ivory" data-i="8" data-m="72" aria-label="C5, hold a quarter beat"><b>C</b><small>5</small></button></span></div></div><div class="bar"><span class="bn">Bar 2</span><div class="tiles"><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="9" data-m="76" aria-label="E5, hold half a beat"><b>E</b><small>5</small></button></span><span class="slot rest" style="--u:2" aria-label="rest"></span><span class="slot" style="--u:1"><button type="button" class="n ivory" data-i="10" data-m="77" aria-label="F5, hold a quarter beat"><b>F</b><small>5</small></button></span><span class="slot" style="--u:1"><button type="button" class="n ivory" data-i="11" data-m="76" aria-label="E5, hold a quarter beat"><b>E</b><small>5</small></button></span><span class="slot" style="--u:1"><button type="button" class="n ebony" data-i="12" data-m="75" aria-label="D♯5, hold a quarter beat"><b>D♯</b><small>5</small></button></span><span class="slot" style="--u:1"><button type="button" class="n ivory" data-i="13" data-m="76" aria-label="E5, hold a quarter beat"><b>E</b><small>5</small></button></span></div></div><div class="bar"><span class="bn">Bar 3</span><div class="tiles"><span class="slot" style="--u:1"><button type="button" class="n ivory" data-i="14" data-m="83" aria-label="B5, hold a quarter beat"><b>B</b><small>5</small></button></span><span class="slot" style="--u:1"><button type="button" class="n ivory" data-i="15" data-m="81" aria-label="A5, hold a quarter beat"><b>A</b><small>5</small></button></span><span class="slot" style="--u:1"><button type="button" class="n ebony" data-i="16" data-m="80" aria-label="G♯5, hold a quarter beat"><b>G♯</b><small>5</small></button></span><span class="slot" style="--u:1"><button type="button" class="n ivory" data-i="17" data-m="81" aria-label="A5, hold a quarter beat"><b>A</b><small>5</small></button></span><span class="slot" style="--u:1"><button type="button" class="n ivory" data-i="18" data-m="83" aria-label="B5, hold a quarter beat"><b>B</b><small>5</small></button></span><span class="slot" style="--u:1"><button type="button" class="n ivory" data-i="19" data-m="81" aria-label="A5, hold a quarter beat"><b>A</b><small>5</small></button></span><span class="slot" style="--u:1"><button type="button" class="n ebony" data-i="20" data-m="80" aria-label="G♯5, hold a quarter beat"><b>G♯</b><small>5</small></button></span><span class="slot" style="--u:1"><button type="button" class="n ivory" data-i="21" data-m="81" aria-label="A5, hold a quarter beat"><b>A</b><small>5</small></button></span></div></div><div class="bar"><span class="bn">Bar 4</span><div class="tiles"><span class="slot" style="--u:4"><button type="button" class="n ivory" data-i="22" data-m="84" aria-label="C6, hold one beat"><b>C</b><small>6</small></button></span><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="23" data-m="81" aria-label="A5, hold half a beat"><b>A</b><small>5</small></button></span><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="24" data-m="84" aria-label="C6, hold half a beat"><b>C</b><small>6</small></button></span></div></div><div class="bar"><span class="bn">Bar 5</span><div class="tiles"><span class="slot" style="--u:2"><span class="grace" title="Quick grace notes: tap them just before this note"><button type="button" class="gn" data-i="25" data-m="79">G</button><button type="button" class="gn" data-i="26" data-m="81">A</button></span><button type="button" class="n ivory" data-i="27" data-m="83" aria-label="B5, hold half a beat"><b>B</b><small>5</small></button></span><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="28" data-m="81" aria-label="A5, hold half a beat"><b>A</b><small>5</small></button></span><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="29" data-m="79" aria-label="G5, hold half a beat"><b>G</b><small>5</small></button></span><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="30" data-m="81" aria-label="A5, hold half a beat"><b>A</b><small>5</small></button></span></div></div><div class="bar"><span class="bn">Bar 6</span><div class="tiles"><span class="slot" style="--u:2"><span class="grace" title="Quick grace notes: tap them just before this note"><button type="button" class="gn" data-i="31" data-m="79">G</button><button type="button" class="gn" data-i="32" data-m="81">A</button></span><button type="button" class="n ivory" data-i="33" data-m="83" aria-label="B5, hold half a beat"><b>B</b><small>5</small></button></span><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="34" data-m="81" aria-label="A5, hold half a beat"><b>A</b><small>5</small></button></span><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="35" data-m="79" aria-label="G5, hold half a beat"><b>G</b><small>5</small></button></span><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="36" data-m="81" aria-label="A5, hold half a beat"><b>A</b><small>5</small></button></span></div></div><div class="bar"><span class="bn">Bar 7</span><div class="tiles"><span class="slot" style="--u:2"><span class="grace" title="Quick grace notes: tap them just before this note"><button type="button" class="gn" data-i="37" data-m="79">G</button><button type="button" class="gn" data-i="38" data-m="81">A</button></span><button type="button" class="n ivory" data-i="39" data-m="83" aria-label="B5, hold half a beat"><b>B</b><small>5</small></button></span><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="40" data-m="81" aria-label="A5, hold half a beat"><b>A</b><small>5</small></button></span><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="41" data-m="79" aria-label="G5, hold half a beat"><b>G</b><small>5</small></button></span><span class="slot" style="--u:2"><button type="button" class="n ebony" data-i="42" data-m="78" aria-label="F♯5, hold half a beat"><b>F♯</b><small>5</small></button></span></div></div><div class="bar"><span class="bn">Bar 8</span><div class="tiles"><span class="slot" style="--u:4"><button type="button" class="n ivory" data-i="43" data-m="76" aria-label="E5, hold one beat"><b>E</b><small>5</small></button></span><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="44" data-m="76" aria-label="E5, hold half a beat"><b>E</b><small>5</small></button></span><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="45" data-m="77" aria-label="F5, hold half a beat"><b>F</b><small>5</small></button></span></div></div></div>
+  
+</section>
+<section class="version" id="simple" data-notes='[[71, 0.0, 0.5], [68, 0.5, 0.5], [72, 1.0, 0.5], [74, 2.0, 0.5], [71, 2.5, 0.5], [76, 3.0, 0.5], [77, 4.0, 0.5], [75, 4.5, 0.5], [83, 5.0, 0.5], [80, 5.5, 0.5], [83, 6.0, 0.5], [80, 6.5, 0.5], [84, 7.0, 0.9999], [81, 8.0, 0.5001], [84, 8.5, 0.5], [83, 9.0, 0.5], [81, 9.5, 0.5001], [79, 10.0, 0.5], [81, 10.5, 0.5], [83, 11.0, 0.5001], [81, 11.5, 0.5], [79, 12.0, 0.4999], [81, 12.4999, 0.5], [83, 13.0001, 0.4999], [81, 13.5, 0.4999], [79, 13.9999, 0.5001], [78, 14.5001, 0.4999], [76, 15.0, 1.0001], [76, 16.0001, 0.4999], [77, 16.5, 0.5]]'>
+  <div class="vhead">
+    <h2>The simplified melody</h2>
+    <p class="facts">30 notes, 60 beats a minute, about 1.76 notes a second</p>
+    <p>The same tune with the quick runs thinned out and the tempo slowed down.</p>
+    <div class="controls">
+      <button type="button" class="play" data-rate="1">Play</button>
+      <button type="button" class="play" data-rate="0.5">Play at half speed</button>
+      <button type="button" class="stop" hidden>Stop</button>
+    </div>
+  </div>
+  <div class="bars"><div class="bar"><span class="bn">Pickup</span><div class="tiles"><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="0" data-m="71" aria-label="B4, hold half a beat"><b>B</b><small>4</small></button></span><span class="slot" style="--u:2"><button type="button" class="n ebony" data-i="1" data-m="68" aria-label="G♯4, hold half a beat"><b>G♯</b><small>4</small></button></span></div></div><div class="bar"><span class="bn">Bar 1</span><div class="tiles"><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="2" data-m="72" aria-label="C5, hold half a beat"><b>C</b><small>5</small></button></span><span class="slot rest" style="--u:2" aria-label="rest"></span><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="3" data-m="74" aria-label="D5, hold half a beat"><b>D</b><small>5</small></button></span><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="4" data-m="71" aria-label="B4, hold half a beat"><b>B</b><small>4</small></button></span></div></div><div class="bar"><span class="bn">Bar 2</span><div class="tiles"><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="5" data-m="76" aria-label="E5, hold half a beat"><b>E</b><small>5</small></button></span><span class="slot rest" style="--u:2" aria-label="rest"></span><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="6" data-m="77" aria-label="F5, hold half a beat"><b>F</b><small>5</small></button></span><span class="slot" style="--u:2"><button type="button" class="n ebony" data-i="7" data-m="75" aria-label="D♯5, hold half a beat"><b>D♯</b><small>5</small></button></span></div></div><div class="bar"><span class="bn">Bar 3</span><div class="tiles"><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="8" data-m="83" aria-label="B5, hold half a beat"><b>B</b><small>5</small></button></span><span class="slot" style="--u:2"><button type="button" class="n ebony" data-i="9" data-m="80" aria-label="G♯5, hold half a beat"><b>G♯</b><small>5</small></button></span><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="10" data-m="83" aria-label="B5, hold half a beat"><b>B</b><small>5</small></button></span><span class="slot" style="--u:2"><button type="button" class="n ebony" data-i="11" data-m="80" aria-label="G♯5, hold half a beat"><b>G♯</b><small>5</small></button></span></div></div><div class="bar"><span class="bn">Bar 4</span><div class="tiles"><span class="slot" style="--u:4"><button type="button" class="n ivory" data-i="12" data-m="84" aria-label="C6, hold one beat"><b>C</b><small>6</small></button></span><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="13" data-m="81" aria-label="A5, hold half a beat"><b>A</b><small>5</small></button></span><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="14" data-m="84" aria-label="C6, hold half a beat"><b>C</b><small>6</small></button></span></div></div><div class="bar"><span class="bn">Bar 5</span><div class="tiles"><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="15" data-m="83" aria-label="B5, hold half a beat"><b>B</b><small>5</small></button></span><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="16" data-m="81" aria-label="A5, hold half a beat"><b>A</b><small>5</small></button></span><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="17" data-m="79" aria-label="G5, hold half a beat"><b>G</b><small>5</small></button></span><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="18" data-m="81" aria-label="A5, hold half a beat"><b>A</b><small>5</small></button></span></div></div><div class="bar"><span class="bn">Bar 6</span><div class="tiles"><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="19" data-m="83" aria-label="B5, hold half a beat"><b>B</b><small>5</small></button></span><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="20" data-m="81" aria-label="A5, hold half a beat"><b>A</b><small>5</small></button></span><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="21" data-m="79" aria-label="G5, hold half a beat"><b>G</b><small>5</small></button></span><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="22" data-m="81" aria-label="A5, hold half a beat"><b>A</b><small>5</small></button></span></div></div><div class="bar"><span class="bn">Bar 7</span><div class="tiles"><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="23" data-m="83" aria-label="B5, hold half a beat"><b>B</b><small>5</small></button></span><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="24" data-m="81" aria-label="A5, hold half a beat"><b>A</b><small>5</small></button></span><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="25" data-m="79" aria-label="G5, hold half a beat"><b>G</b><small>5</small></button></span><span class="slot" style="--u:2"><button type="button" class="n ebony" data-i="26" data-m="78" aria-label="F♯5, hold half a beat"><b>F♯</b><small>5</small></button></span></div></div><div class="bar"><span class="bn">Bar 8</span><div class="tiles"><span class="slot" style="--u:4"><button type="button" class="n ivory" data-i="27" data-m="76" aria-label="E5, hold one beat"><b>E</b><small>5</small></button></span><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="28" data-m="76" aria-label="E5, hold half a beat"><b>E</b><small>5</small></button></span><span class="slot" style="--u:2"><button type="button" class="n ivory" data-i="29" data-m="77" aria-label="F5, hold half a beat"><b>F</b><small>5</small></button></span></div></div></div>
+  <div class="changes"><h3>What the simplifier changed</h3><ul><li>Dropped the two quick grace notes before the B in bars 5, 6 and 7.</li><li>Kept two notes out of every quick run of four, so the fastest notes are now half a beat.</li><li>Slowed down from 90 to 60 beats a minute.</li></ul></div>
+</section>
+<footer>Notes from the public-domain Mutopia Project score of K. 331 (examples/rondo/source).
+Generated by <code>python -m examples.rondo_practice</code>. Two-note intervals in bars 5 to 8 keep their top note.</footer>
+</div><script>
+const ctx = () => (window._ac ||= new (window.AudioContext || window.webkitAudioContext)());
+const hz = m => 440 * Math.pow(2, (m - 69) / 12);
+function tone(m, t, d) {           // reedy, harmonium-like voice
+  const ac = ctx(), g = ac.createGain(), f = ac.createBiquadFilter();
+  f.type = "lowpass"; f.frequency.value = 2200; g.connect(ac.destination); f.connect(g);
+  [0, 4].forEach(c => { const o = ac.createOscillator(); o.type = "sawtooth"; o.frequency.value = hz(m);
+    o.detune.value = c; o.connect(f); o.start(t); o.stop(t + d + 0.1); });
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.12, t + 0.03);
+  g.gain.setValueAtTime(0.12, t + Math.max(0.04, d - 0.04)); g.gain.linearRampToValueAtTime(0, t + d + 0.08);
+}
+function light(sec, i, m, on) {
+  sec.querySelectorAll(`[data-i="${i}"]`).forEach(e => e.classList.toggle("on", on));
+  document.querySelectorAll(`.kb [data-m="${m}"]`).forEach(e => e.classList.toggle("on", on));
+}
+let timers = [];
+function stopAll() {
+  timers.forEach(clearTimeout); timers = [];
+  document.querySelectorAll(".on").forEach(e => e.classList.remove("on"));
+  document.querySelectorAll(".stop").forEach(b => b.hidden = true);
+  if (window._ac) { window._ac.close(); window._ac = null; }
+}
+document.querySelectorAll(".version").forEach(sec => {
+  const notes = JSON.parse(sec.dataset.notes);
+  sec.querySelectorAll(".play").forEach(btn => btn.addEventListener("click", () => {
+    stopAll();
+    const rate = +btn.dataset.rate, ac = ctx(), t0 = ac.currentTime + 0.15;
+    notes.forEach(([m, t, d], i) => {
+      tone(m, t0 + t / rate, d / rate);
+      timers.push(setTimeout(() => light(sec, i, m, true), 150 + 1000 * t / rate));
+      timers.push(setTimeout(() => light(sec, i, m, false), 150 + 1000 * (t + d) / rate));
+    });
+    const last = notes[notes.length - 1];
+    timers.push(setTimeout(stopAll, 400 + 1000 * (last[1] + last[2]) / rate));
+    sec.querySelector(".stop").hidden = false;
+  }));
+  sec.querySelector(".stop").addEventListener("click", stopAll);
+  sec.querySelectorAll("[data-i]").forEach(el => el.addEventListener("click", () => {
+    const [m, , d] = notes[+el.dataset.i], ac = ctx();
+    tone(m, ac.currentTime + 0.01, Math.min(d, 0.6));
+    light(sec, el.dataset.i, m, true); setTimeout(() => light(sec, el.dataset.i, m, false), 450);
+  }));
+});
+</script></body></html>

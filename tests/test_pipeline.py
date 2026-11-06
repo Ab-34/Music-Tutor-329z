@@ -32,3 +32,14 @@ def test_ladder_gets_easier():
     d1 = difficulty(STEPS["drop_inner_voices"](ref))["mean_polyphony"]
     d2 = difficulty(STEPS["melody_only"](ref))["mean_polyphony"]
     assert d0 >= d1 >= d2 == 1.0
+
+
+def test_single_line_simplifications():
+    from tutor.notes import Note
+    from tutor.tools.simplify import drop_ornaments, thin_to_grid
+    run = [Note(71, 0.0, 0.24), Note(69, 0.25, 0.49), Note(68, 0.5, 0.74), Note(69, 0.75, 0.99),
+           Note(67, 1.47, 1.49), Note(72, 1.5, 1.99)]  # four sixteenths, a grace note, an eighth
+    assert [n.pitch for n in drop_ornaments(run)] == [71, 69, 68, 69, 72]
+    thin = thin_to_grid(drop_ornaments(run), grid=0.5)
+    assert [(n.pitch, n.onset) for n in thin] == [(71, 0.0), (68, 0.5), (72, 1.5)]
+    assert thin[0].offset == 0.5 and thin[1].offset == 1.0  # held for the whole eighth
